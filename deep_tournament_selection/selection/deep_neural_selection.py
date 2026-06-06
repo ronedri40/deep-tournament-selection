@@ -193,7 +193,9 @@ class DeepNeuralSelection:
                                         dtype=torch.long)
 
         if teacher_forcing_indexes is not None:
-            teacher_forcing_indexes = torch.tensor(teacher_forcing_indexes, device=self.device, dtype=torch.long)
+            # as_tensor avoids the "copy construct from a tensor" warning when the
+            # input is already a tensor (it is, when called from the tournament path).
+            teacher_forcing_indexes = torch.as_tensor(teacher_forcing_indexes, device=self.device, dtype=torch.long)
 
         trajectory_log_probabilities, selected_population_indices = self.pointer_transformer(embedded_population,
                                                                                              n_to_select,
