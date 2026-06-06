@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "deep-tournament-selection"
+version = "0.1.0"
+description = "Deep Tournament Selection (DTS): a learned, RL-trained selection operator for EC-KitY"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "eckity",
+    "torch",
+    "numpy",
+    "overrides",
+]
+
+[tool.setuptools.packages.find]
+include = ["deep_tournament_selection*"]
