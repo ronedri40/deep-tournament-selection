@@ -23,6 +23,7 @@ from eckity.termination_checkers.threshold_from_target_termination_checker impor
 )
 
 from .common import build_dts_operator
+from ..caching_evaluator import CachingEvaluator
 
 
 class OneMaxEvaluator(SimpleIndividualEvaluator):
@@ -38,6 +39,8 @@ def main():
     parser.add_argument("--length", type=int, default=100)
     parser.add_argument("--generations", type=int, default=500)
     parser.add_argument("--device", default="cpu")
+    parser.add_argument("--no-cache", dest="cache", action="store_false",
+                        help="disable the persistent fitness cache")
     args = parser.parse_args()
 
     dts = build_dts_operator(
@@ -46,11 +49,17 @@ def main():
         device=args.device,
     )
 
+    # Persistent fitness cache (ports the original GA's fitness_dict): skips
+    # recomputation for genotypes already scored (elites, unchanged clones).
+    evaluator = OneMaxEvaluator()
+    if args.cache:
+        evaluator = CachingEvaluator(evaluator)
+
     algo = SimpleEvolution(
         Subpopulation(
             creators=GABitStringVectorCreator(length=args.length),
             population_size=args.population_size,
-            evaluator=OneMaxEvaluator(),
+            evaluator=evaluator,
             higher_is_better=True,
             elitism_rate=1 / args.population_size,
             operators_sequence=[
@@ -73,6 +82,8 @@ def main():
 
     algo.evolve()
     print(algo.execute())
+    if args.cache:
+        print("fitness cache:", evaluator.cache_stats())
 
 
 if __name__ == "__main__":

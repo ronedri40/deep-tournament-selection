@@ -41,6 +41,23 @@ dts = build_dts_operator(population_size=300, vocab_size=2)  # vocab_size = max 
 selection_methods=[(dts, 1)]
 ```
 
+## Fitness cache
+
+EC-KitY re-evaluates every individual every generation. To preserve the original GA's
+cross-generation fitness cache (skip recomputing the fitness of genotypes already scored — elites,
+unchanged clones), wrap your evaluator in `CachingEvaluator`:
+
+```python
+from deep_tournament_selection import CachingEvaluator
+
+evaluator = CachingEvaluator(MyEvaluator())   # tuple(vector) -> fitness, like the old fitness_dict
+Subpopulation(..., evaluator=evaluator, ...)
+print(evaluator.cache_stats())                # {'hits': ..., 'misses': ..., 'hit_rate': ...}
+```
+
+The `one_max` demo enables it by default (use `--no-cache` to turn it off). Caching matters most when
+the fitness function is expensive; it works with single-process evaluation (`max_workers=1`).
+
 ## Install & run
 
 ```bash
