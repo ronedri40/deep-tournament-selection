@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from torch import Tensor
 
-from .dns_aux import get_ranks_from_fitness_values, \
+from .dts_aux import get_ranks_from_fitness_values, \
     get_reward_from_fitness_scores, get_trajectory_probability_from_log_probs
 from .tournament_utils import get_fit, tournament_selection
 from .population_to_vec_transformer import PopulationToVecTransformer
@@ -17,7 +17,10 @@ def get_tournament_indexes(population_, n_to_select_, fitness_dict_, tournament_
                                 return_index=True)
 
 
-class DeepNeuralSelection:
+class DTSPolicy:
+    """Core engine of Deep Tournament Selection (DTS): a Transformer encoder + a
+    self-attention pointer, trained online with REINFORCE."""
+
     def __init__(self, pop_to_vec_transformer: PopulationToVecTransformer,
                  pointer_transformer: SelfAttentionPointer,
                  device='cpu',

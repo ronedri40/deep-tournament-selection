@@ -5,7 +5,7 @@
 EC-KitY ``DeepTournamentSelection`` adapter, ready to drop into a
 ``Subpopulation``'s ``selection_methods``.
 """
-from ..selection.deep_neural_selection import DeepNeuralSelection
+from ..selection.dts_policy import DTSPolicy
 from ..selection.eckity_adapter import DeepTournamentSelection
 from ..selection.population_to_vec_transformer import PopulationToVecTransformer
 from ..selection.self_attention_pointer import SelfAttentionPointer
@@ -62,7 +62,7 @@ def build_dts_operator(
         from ..selection.tournament_utils import tournament_selection
         return tournament_selection(pop, n_select, tournament_size, fit_dict, return_index=True)
 
-    dns = DeepNeuralSelection(
+    policy = DTSPolicy(
         pop_to_vec_transformer=encoder,
         pointer_transformer=decoder,
         teacher_forcing_algorithm=teacher_forcing,
@@ -75,4 +75,4 @@ def build_dts_operator(
         min_epsilon=min_epsilon,
     )
 
-    return DeepTournamentSelection(dns, higher_is_better=higher_is_better)
+    return DeepTournamentSelection(policy, higher_is_better=higher_is_better)

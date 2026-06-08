@@ -1,6 +1,6 @@
 """Standalone helpers extracted from the original ga_deapless.py / ga_auxiliary.py.
 
-These are the only pieces of the original custom GA that DeepNeuralSelection (DTS)
+These are the only pieces of the original custom GA that the DTS policy
 depends on. Extracting them here keeps the DTS package free of the monolithic GA
 (numba, multiprocessing, the whole custom evolution loop), so it can run purely as
 an EC-KitY operator.

@@ -51,7 +51,7 @@ single line: `selection_methods=[(dts, 1)]`.
 deep_tournament_selection/
   selection/            # DTS operator + EC-KitY adapter + the neural networks
     eckity_adapter.py   #   DeepTournamentSelection(SelectionMethod)  <-- the glue
-    deep_neural_selection.py, population_to_vec_transformer.py, self_attention_pointer.py, ...
+    dts_policy.py, population_to_vec_transformer.py, self_attention_pointer.py, ...
   caching_evaluator.py  # persistent fitness cache (ports the original GA's fitness_dict)
   problems/             # EC-KitY evaluators + loaders + custom operators + bundled instances
     tsp.py, graph_coloring.py, set_cover.py, operators.py, data/

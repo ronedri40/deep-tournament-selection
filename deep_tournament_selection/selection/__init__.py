@@ -1,4 +1,4 @@
 from .eckity_adapter import DeepTournamentSelection
-from .deep_neural_selection import DeepNeuralSelection
+from .dts_policy import DTSPolicy
 
-__all__ = ["DeepTournamentSelection", "DeepNeuralSelection"]
+__all__ = ["DeepTournamentSelection", "DTSPolicy"]

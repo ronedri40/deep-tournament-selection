@@ -1,7 +1,7 @@
 """EC-KitY adapter for the Deep Tournament Selection (DTS) operator.
 
-This is the thin glue layer that lets the learned, RL-trained DTS operator
-(``DeepNeuralSelection``) plug into EC-KitY's evolutionary loop by wrapping it as
+This is the thin glue layer that lets the learned, RL-trained DTS engine
+(``DTSPolicy``) plug into EC-KitY's evolutionary loop by wrapping it as
 an EC-KitY ``SelectionMethod``.
 
 Interface mismatch this bridges
@@ -20,19 +20,19 @@ from overrides import override
 
 from eckity.genetic_operators.selections.selection_method import SelectionMethod
 
-from .deep_neural_selection import DeepNeuralSelection
+from .dts_policy import DTSPolicy
 
 
 class DeepTournamentSelection(SelectionMethod):
     """EC-KitY ``SelectionMethod`` wrapping the learned DTS operator.
 
     Assumes maximization (``higher_is_better=True``) — this matches
-    ``DeepNeuralSelection``, which always treats fitness as a value to maximize.
+    ``DTSPolicy``, which always treats fitness as a value to maximize.
 
     Parameters
     ----------
-    dns : DeepNeuralSelection
-        The raw, already-constructed DTS operator (encoder + pointer + RL training).
+    policy : DTSPolicy
+        The raw, already-constructed DTS engine (encoder + pointer + RL training).
     higher_is_better : bool, optional
         Fitness direction, by default True. Keep True unless the wrapped DTS is
         adapted for minimization.
@@ -40,9 +40,9 @@ class DeepTournamentSelection(SelectionMethod):
         Selection events, by default None.
     """
 
-    def __init__(self, dns: DeepNeuralSelection, higher_is_better: bool = True, events=None):
+    def __init__(self, policy: DTSPolicy, higher_is_better: bool = True, events=None):
         super().__init__(events=events, higher_is_better=higher_is_better)
-        self.dns = dns
+        self.policy = policy
         # DTS needs a monotonically increasing per-generation counter for its
         # trajectory/reward bookkeeping (gen i vs gen i-1). SimpleBreeder calls
         # this select() exactly once per generation for a single subpopulation,
@@ -61,7 +61,7 @@ class DeepTournamentSelection(SelectionMethod):
         # Map each gene-vector back to its source Individual so we can clone winners.
         lookup = {tuple(ind.vector): ind for ind in source_inds}
 
-        selected_vectors = self.dns.select(
+        selected_vectors = self.policy.select(
             population, n_to_select, fitness_dict, self.generation_index
         )
         self.generation_index += 1
