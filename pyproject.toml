@@ -17,3 +17,6 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 include = ["deep_tournament_selection*"]
+
+[tool.setuptools.package-data]
+deep_tournament_selection = ["problems/data/**/*"]

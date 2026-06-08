@@ -41,6 +41,39 @@ dts = build_dts_operator(population_size=300, vocab_size=2)  # vocab_size = max 
 selection_methods=[(dts, 1)]
 ```
 
+## Benchmark problems (from the paper)
+
+The repo bundles the three problems reported in the DTS paper, each as an EC-KitY
+evaluator with a per-problem runner (mirroring BERT-Mutation-GA's experiments layout).
+Instance files are bundled under `deep_tournament_selection/problems/data/`.
+
+| Problem | Representation | Operators | Runner |
+|---|---|---|---|
+| **TSP** | permutation (IntVector) | SCX crossover + RSM mutation | `experiments.tsp` |
+| **Graph Coloring** | IntVector, colors `[0, n-10]` | uniform XO + per-gene int mutation | `experiments.graph_coloring` |
+| **Set Cover** | bit vector | uniform XO + per-bit flip mutation | `experiments.set_cover` |
+
+All three are framed as maximization (fitness = negated cost), matching DTS. Each runner
+swaps in DTS by default, or the standard tournament baseline with `--selection tournament`:
+
+```bash
+# defaults (paper instances, pop=100, 6000 gens) — heavy; use flags for a quick run:
+python -m deep_tournament_selection.experiments.tsp --instance att48.tsp --generations 100
+python -m deep_tournament_selection.experiments.graph_coloring --instance queen8_12.col.txt --generations 100
+python -m deep_tournament_selection.experiments.set_cover --instance scp41.txt --generations 100
+
+# compare against the baseline selection on the same setup:
+python -m deep_tournament_selection.experiments.tsp --instance att48.tsp --generations 100 --selection tournament
+
+# run every bundled instance:
+python -m deep_tournament_selection.experiments.set_cover --instance all --runs 5
+```
+
+Common flags: `--instance <file|all>`, `--selection dts|tournament`, `--population-size`,
+`--generations`, `--runs`, `--crossover-prob`, `--mutation-prob`, `--output`, `--device`, `--quiet`.
+Per-generation best/avg fitness is saved as JSON under `--output` (default `runs/`).
+Default hyperparameters per problem live in `config.py`.
+
 ## Fitness cache
 
 EC-KitY re-evaluates every individual every generation. To preserve the original GA's
