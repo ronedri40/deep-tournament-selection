@@ -133,14 +133,11 @@ The paper's fitness and population-diversity plots are in [`figures/`](figures/)
 
 ## Citation
 
-```bibtex
-@inproceedings{shemtov2026dts,
-  title     = {Deep Tournament Selection for Genetic Algorithms},
-  author    = {Shem-Tov, Eliad and Edri, Ron and Elyasaf, Achiya},
-  booktitle = {Parallel Problem Solving from Nature (PPSN)},
-  year      = {2026},
-}
-```
+> **Note:** the paper has not been published yet. A citation (BibTeX) will be added here once it is
+> available.
+
+Paper: *Deep Tournament Selection for Genetic Algorithms* — Eliad Shem-Tov, Ron Edri, Achiya Elyasaf
+(Ben-Gurion University of the Negev).
 
 ## License
 
