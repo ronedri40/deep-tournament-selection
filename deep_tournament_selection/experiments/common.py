@@ -37,7 +37,7 @@ def build_dts_operator(
         Subpopulation size. The encoder's rank embedding table must cover every
         individual, so ``max_pointers`` is set to this value.
     vocab_size : int
-        Number of distinct gene values + 1 (e.g. 2 for a bit-vector / OneMax).
+        Number of distinct gene values + 1 (e.g. 2 for a bit-vector).
     latent_dim / emb_dim / n_heads / n_layers / dim_feedforward :
         Encoder transformer dimensions. The pointer decoder's ``d_model`` is tied
         to ``latent_dim`` because it consumes the encoder's latent embeddings.

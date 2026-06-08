@@ -55,8 +55,8 @@ deep_tournament_selection/
   caching_evaluator.py  # persistent fitness cache (ports the original GA's fitness_dict)
   problems/             # EC-KitY evaluators + loaders + custom operators + bundled instances
     tsp.py, graph_coloring.py, set_cover.py, operators.py, data/
-  experiments/          # per-problem runners + shared helpers + a OneMax demo
-    tsp.py, graph_coloring.py, set_cover.py, common.py, runner_utils.py, one_max.py
+  experiments/          # per-problem runners + shared helpers
+    tsp.py, graph_coloring.py, set_cover.py, common.py, runner_utils.py
   config.py             # paper hyperparameters
   logging_utils.py      # per-generation JSON statistics
 run_experiments.py      # single entry point to sweep all problems x instances x runs
