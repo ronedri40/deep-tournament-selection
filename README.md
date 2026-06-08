@@ -9,7 +9,7 @@ reinforcement learning, and is implemented as a drop-in [EC-KitY](https://github
 `SelectionMethod`.
 
 <p align="center">
-  <img src="images/dns_arch.png" alt="Deep Tournament Selection architecture" width="780">
+  <img src="images/dts_arch.png" alt="Deep Tournament Selection architecture" width="780">
 </p>
 
 ## Abstract
@@ -129,7 +129,7 @@ print(evaluator.cache_stats())   # {'hits': ..., 'misses': ..., 'hit_rate': ...}
 ## Results figures
 
 The paper's fitness and population-diversity plots are in [`figures/`](figures/)
-(`fitness_graph_dns_all_domains.pdf`, per-domain plots, and `hamming_distance_all_domains.pdf`).
+(`fitness_graph_dts_all_domains.pdf`, per-domain plots, and `hamming_distance_all_domains.pdf`).
 
 ## Citation
 
