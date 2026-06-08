@@ -44,8 +44,9 @@ def main():
             creator = GAIntVectorCreator(length=n_nodes, bounds=(0, max_colors))
             operators = [
                 VectorUniformCrossover(probability=args.crossover_prob),
-                IntVectorOnePointMutation(probability=args.mutation_prob,
-                                          probability_for_each=cfg.flip_mutation_prob),
+                # uniform mutation: each gene reassigned with prob `mutation_prob`
+                IntVectorOnePointMutation(probability=1.0,
+                                          probability_for_each=args.mutation_prob),
             ]
             selection = make_selection(args.selection, args.population_size,
                                        vocab_size=max_colors + 1, dts_cfg=dts, device=args.device)

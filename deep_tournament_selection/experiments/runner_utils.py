@@ -24,8 +24,12 @@ def make_selection(kind, population_size, vocab_size, dts_cfg=None, device="cpu"
         if dts_cfg is not None:
             kwargs = dict(
                 latent_dim=dts_cfg.latent_dim,
+                dim_feedforward=dts_cfg.dim_feedforward,
+                n_layers=dts_cfg.n_layers,
+                n_heads=dts_cfg.n_heads,
                 tournament_size=dts_cfg.tournament_size,
                 learning_rate=dts_cfg.learning_rate,
+                final_lr=dts_cfg.final_lr,
                 train_every_n_gens=dts_cfg.train_every_n_gens,
                 epsilon_greedy=dts_cfg.epsilon_greedy,
                 epsilon_greedy_decay=dts_cfg.epsilon_greedy_decay,

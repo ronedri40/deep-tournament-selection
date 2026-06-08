@@ -1,104 +1,148 @@
-# Deep Tournament Selection (DTS) for EC-KitY
+# Deep Tournament Selection (DTS) for Genetic Algorithms
 
-A learned, RL-trained **selection** operator for genetic algorithms, packaged as an
-[EC-KitY](https://github.com/EC-KitY/EC-KitY) `SelectionMethod`. This repo follows the same
-structure as [BERT-Mutation-GA](https://github.com/EC-KitY/BERT-Mutation-GA): one custom genetic
-operator wrapped in a thin EC-KitY adapter, plus runnable experiments.
+Reference implementation of **"Deep Tournament Selection for Genetic Algorithms"**
+(Eliad Shem-Tov, Ron Edri, Achiya Elyasaf — Ben-Gurion University of the Negev).
 
-Instead of a fixed rule (tournament, roulette, …), DTS *learns* which individuals to select. A
-Transformer encoder embeds the whole population, a self-attention pointer network picks tournament
-winners, and the policy is trained online with REINFORCE using the population's fitness improvement
-as reward.
+DTS is a **learned, domain-independent selection operator** for genetic algorithms. It reframes
+tournament selection as a Markov Decision Process optimized online with policy-gradient
+reinforcement learning, and is implemented as a drop-in [EC-KitY](https://github.com/EC-KitY/EC-KitY)
+`SelectionMethod`. Built on the same template as
+[BERT-Mutation-GA](https://github.com/EC-KitY/BERT-Mutation-GA).
 
-## Layout
+<p align="center">
+  <img src="images/dns_arch.png" alt="Deep Tournament Selection architecture" width="780">
+</p>
+
+## Abstract
+
+In Genetic Algorithms (GAs), the selection operator plays a critical role in balancing exploration
+and exploitation. However, classical and adaptive selection mechanisms largely rely on static rules
+or handcrafted heuristics that fail to adapt to the real-time dynamics of the evolving population. In
+this work, we introduce **Deep Tournament Selection (DTS)**, a novel domain-independent selection
+operator that reformulates tournament selection as a Markov Decision Process optimized via
+reinforcement learning. DTS evaluates candidate solutions in a tournament using a Transformer encoder
+augmented with global and local rank-based positional encodings, along with a self-attention pointer
+mechanism. The policy is trained fully online using policy-gradient reinforcement learning **without
+requiring additional fitness evaluations**, enabling the operator to dynamically adjust its selection
+pressure. We evaluate DTS on three canonical combinatorial optimization domains — **Graph Coloring,
+Set Cover, and the Traveling Salesman Problem** — and show faster convergence, improved solution
+quality, and robust performance compared to classical and dynamic selection baselines, while
+introducing negligible computational overhead and preserving population diversity.
+
+## Method
+
+DTS operates through three components (`deep_tournament_selection/selection/`):
+
+1. **Fitness-Augmented Embedding** — a Transformer encoder maps each individual (an integer vector)
+   to a latent vector, augmented with **global** (population-level) and **local** (within-tournament)
+   rank-based positional encodings that inject relative fitness information.
+2. **Contextual Tournament Evaluation** — a self-attention pointer mechanism jointly scores the
+   candidates in each tournament and produces a stochastic selection policy.
+3. **Selection as an MDP** — parent sampling is framed as an RL problem and the policy is trained
+   online with policy gradients, using the improvement in the top-*m* individuals between consecutive
+   generations as reward (no extra fitness evaluations).
+
+The whole stack is wrapped in a thin EC-KitY adapter,
+`selection/eckity_adapter.py::DeepTournamentSelection(SelectionMethod)`, so it slots into any GA as a
+single line: `selection_methods=[(dts, 1)]`.
+
+## Repository layout
 
 ```
 deep_tournament_selection/
-  selection/
-    eckity_adapter.py        # DeepTournamentSelection(SelectionMethod)  <-- the EC-KitY glue
-    deep_neural_selection.py # core DTS: REINFORCE training loop
-    population_to_vec_transformer.py / self_attention_pointer.py / ...  # the neural networks
-    tournament_utils.py      # standalone tournament helper (teacher-forcing baseline)
-  experiments/
-    common.py                # build_dts_operator(...) -> ready-to-use SelectionMethod
-    one_max.py               # OneMax demo (built-in EC-KitY problem) using DTS
+  selection/            # DTS operator + EC-KitY adapter + the neural networks
+    eckity_adapter.py   #   DeepTournamentSelection(SelectionMethod)  <-- the glue
+    deep_neural_selection.py, population_to_vec_transformer.py, self_attention_pointer.py, ...
+  caching_evaluator.py  # persistent fitness cache (ports the original GA's fitness_dict)
+  problems/             # EC-KitY evaluators + loaders + custom operators + bundled instances
+    tsp.py, graph_coloring.py, set_cover.py, operators.py, data/
+  experiments/          # per-problem runners + shared helpers + a OneMax demo
+    tsp.py, graph_coloring.py, set_cover.py, common.py, runner_utils.py, one_max.py
+  config.py             # paper hyperparameters
+  logging_utils.py      # per-generation JSON statistics
+run_experiments.py      # single entry point to sweep all problems x instances x runs
+figures/                # fitness / diversity plots from the paper
+images/                 # architecture diagrams
 ```
 
-This is a standalone repository that depends on EC-KitY (it does not modify the EC-KitY source
-tree). Install it next to EC-KitY and it works as a drop-in selection operator.
+## Benchmark domains (from the paper)
 
-## How it plugs in
-
-`DeepTournamentSelection` extends EC-KitY's `SelectionMethod`. Its `select(source_inds, dest_inds)`
-converts the `Individual` objects into the numpy `(population, fitness_dict)` form the learned
-operator expects, runs the policy, then clones the chosen individuals back into `dest_inds`.
-
-```python
-from deep_tournament_selection.experiments.common import build_dts_operator
-
-dts = build_dts_operator(population_size=300, vocab_size=2)  # vocab_size = max gene value + 1
-# ... then in your Subpopulation:
-selection_methods=[(dts, 1)]
-```
-
-## Benchmark problems (from the paper)
-
-The repo bundles the three problems reported in the DTS paper, each as an EC-KitY
-evaluator with a per-problem runner (mirroring BERT-Mutation-GA's experiments layout).
-Instance files are bundled under `deep_tournament_selection/problems/data/`.
-
-| Problem | Representation | Operators | Runner |
+| Domain | Encoding | Operators | Instances |
 |---|---|---|---|
-| **TSP** | permutation (IntVector) | SCX crossover + RSM mutation | `experiments.tsp` |
-| **Graph Coloring** | IntVector, colors `[0, n-10]` | uniform XO + per-gene int mutation | `experiments.graph_coloring` |
-| **Set Cover** | bit vector | uniform XO + per-bit flip mutation | `experiments.set_cover` |
+| **Graph Coloring** | integer vector (color per vertex) | uniform crossover + uniform mutation | DIMACS, 96–450 vertices |
+| **Set Cover** | bit vector (subset selected) | uniform crossover + bit-flip mutation | OR-Library, 1000/2000 subsets |
+| **TSP** | permutation (tour order) | SCX crossover + RSM mutation | TSPLIB, 48–1291 cities |
 
-All three are framed as maximization (fitness = negated cost), matching DTS. Each runner
-swaps in DTS by default, or the standard tournament baseline with `--selection tournament`:
+All are framed as maximization (fitness = negated cost), matching DTS. Instance files are bundled
+under `deep_tournament_selection/problems/data/`.
+
+## Install
 
 ```bash
-# defaults (paper instances, pop=100, 6000 gens) — heavy; use flags for a quick run:
-python -m deep_tournament_selection.experiments.tsp --instance att48.tsp --generations 100
-python -m deep_tournament_selection.experiments.graph_coloring --instance queen8_12.col.txt --generations 100
-python -m deep_tournament_selection.experiments.set_cover --instance scp41.txt --generations 100
+pip install -e .          # or: pip install -r requirements.txt
+```
+Requires Python 3.9+, PyTorch, numpy, eckity, overrides.
 
-# compare against the baseline selection on the same setup:
-python -m deep_tournament_selection.experiments.tsp --instance att48.tsp --generations 100 --selection tournament
+## Usage
 
-# run every bundled instance:
-python -m deep_tournament_selection.experiments.set_cover --instance all --runs 5
+Each problem has its own runner; swap DTS for the tournament baseline with `--selection tournament`.
+Defaults follow the paper (pop 100, 6000 gens for GC/SC, 1000 for TSP); use flags for a quick run:
+
+```bash
+# quick single-instance runs
+python -m deep_tournament_selection.experiments.graph_coloring --instance queen8_12.col.txt --generations 200
+python -m deep_tournament_selection.experiments.set_cover      --instance scp41.txt        --generations 200
+python -m deep_tournament_selection.experiments.tsp            --instance att48.tsp         --generations 200
+
+# baseline comparison on the same setup
+python -m deep_tournament_selection.experiments.tsp --instance att48.tsp --generations 200 --selection tournament
+
+# sweep everything (paper protocol uses --runs 15)
+python run_experiments.py --problems all --selection both --runs 3 --generations 500
 ```
 
 Common flags: `--instance <file|all>`, `--selection dts|tournament`, `--population-size`,
 `--generations`, `--runs`, `--crossover-prob`, `--mutation-prob`, `--output`, `--device`, `--quiet`.
-Per-generation best/avg fitness is saved as JSON under `--output` (default `runs/`).
-Default hyperparameters per problem live in `config.py`.
+Per-generation best/avg fitness is written as JSON under `--output` (default `runs/`).
+
+### Using DTS in your own EC-KitY experiment
+
+```python
+from deep_tournament_selection.experiments.common import build_dts_operator
+
+dts = build_dts_operator(population_size=100, vocab_size=2)  # vocab_size = max gene value + 1
+# ... inside your Subpopulation:
+selection_methods=[(dts, 1)]
+```
 
 ## Fitness cache
 
 EC-KitY re-evaluates every individual every generation. To preserve the original GA's
-cross-generation fitness cache (skip recomputing the fitness of genotypes already scored — elites,
-unchanged clones), wrap your evaluator in `CachingEvaluator`:
+cross-generation fitness cache (skip recomputing already-scored genotypes — elites, unchanged
+clones), wrap your evaluator in `CachingEvaluator` (the runners do this by default):
 
 ```python
 from deep_tournament_selection import CachingEvaluator
-
-evaluator = CachingEvaluator(MyEvaluator())   # tuple(vector) -> fitness, like the old fitness_dict
-Subpopulation(..., evaluator=evaluator, ...)
-print(evaluator.cache_stats())                # {'hits': ..., 'misses': ..., 'hit_rate': ...}
+evaluator = CachingEvaluator(MyEvaluator())
+print(evaluator.cache_stats())   # {'hits': ..., 'misses': ..., 'hit_rate': ...}
 ```
 
-The `one_max` demo enables it by default (use `--no-cache` to turn it off). Caching matters most when
-the fitness function is expensive; it works with single-process evaluation (`max_workers=1`).
+## Results figures
 
-## Install & run
+The paper's fitness and population-diversity plots are in [`figures/`](figures/)
+(`fitness_graph_dns_all_domains.pdf`, per-domain plots, and `hamming_distance_all_domains.pdf`).
 
-```bash
-pip install -e .            # or: pip install -r requirements.txt
-python -m deep_tournament_selection.experiments.one_max          # full run (pop=300, len=100)
-# quick smoke test:
-python -m deep_tournament_selection.experiments.one_max --population-size 60 --length 40 --generations 30
+## Citation
+
+```bibtex
+@inproceedings{shemtov2026dts,
+  title     = {Deep Tournament Selection for Genetic Algorithms},
+  author    = {Shem-Tov, Eliad and Edri, Ron and Elyasaf, Achiya},
+  booktitle = {Parallel Problem Solving from Nature (PPSN)},
+  year      = {2026},
+}
 ```
 
-You should see best fitness climb toward `length`, with periodic `loss: ..., reward: ...` lines
-printed by the DTS training loop — confirming the operator is learning inside EC-KitY's evolution.
+## License
+
+Released under the **BSD 3-Clause License** — see [LICENSE](LICENSE).
