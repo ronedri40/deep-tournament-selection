@@ -6,8 +6,7 @@ Reference implementation of **"Deep Tournament Selection for Genetic Algorithms"
 DTS is a **learned, domain-independent selection operator** for genetic algorithms. It reframes
 tournament selection as a Markov Decision Process optimized online with policy-gradient
 reinforcement learning, and is implemented as a drop-in [EC-KitY](https://github.com/EC-KitY/EC-KitY)
-`SelectionMethod`. Built on the same template as
-[BERT-Mutation-GA](https://github.com/EC-KitY/BERT-Mutation-GA).
+`SelectionMethod`.
 
 <p align="center">
   <img src="images/dns_arch.png" alt="Deep Tournament Selection architecture" width="780">

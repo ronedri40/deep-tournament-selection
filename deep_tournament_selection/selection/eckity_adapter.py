@@ -1,9 +1,8 @@
 """EC-KitY adapter for the Deep Tournament Selection (DTS) operator.
 
 This is the thin glue layer that lets the learned, RL-trained DTS operator
-(``DeepNeuralSelection``) plug into EC-KitY's evolutionary loop, exactly the way
-``BERT-Mutation-GA``'s ``eckity_adapter.py`` wraps its BERT mutation as a
-``GeneticOperator``.
+(``DeepNeuralSelection``) plug into EC-KitY's evolutionary loop by wrapping it as
+an EC-KitY ``SelectionMethod``.
 
 Interface mismatch this bridges
 -------------------------------

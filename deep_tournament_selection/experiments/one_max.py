@@ -1,7 +1,6 @@
 """OneMax demo: the learned DTS operator plugged into EC-KitY's SimpleEvolution.
 
-This is the selection-side analogue of BERT-Mutation-GA's experiments: we take a
-problem that already exists in EC-KitY (OneMax) and swap the standard
+We take a problem that already exists in EC-KitY (OneMax) and swap the standard
 ``TournamentSelection`` for our ``DeepTournamentSelection`` (DTS).
 
 Run:
