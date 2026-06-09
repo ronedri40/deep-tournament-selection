@@ -24,9 +24,9 @@ def build_dts_operator(
     learning_rate=2e-3,
     final_lr=1e-3,
     train_every_n_gens=10,
-    epsilon_greedy=0.2,
+    epsilon_greedy=1.0,
     epsilon_greedy_decay=0.999,
-    min_epsilon=0.0,
+    min_epsilon=0.2,
     higher_is_better=True,
 ):
     """Build the DTS operator as an EC-KitY ``SelectionMethod``.

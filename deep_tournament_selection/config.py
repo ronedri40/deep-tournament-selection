@@ -26,9 +26,12 @@ class DTSConfig:
     learning_rate: float = 2e-3
     final_lr: float = 1e-3            # linearly decayed to this
     train_every_n_gens: int = 10
-    epsilon_greedy: float = 0.2       # teacher-forcing probability (decays)
+    # Teacher forcing: start greedy (follow the tournament winner) and decay
+    # exponentially down to a 0.2 floor — a gradual transition from greedy
+    # behaviour to fully learned selection (paper).
+    epsilon_greedy: float = 1.0
     epsilon_greedy_decay: float = 0.999
-    min_epsilon: float = 0.0
+    min_epsilon: float = 0.2
 
 
 # Shared GA parameters (identical across domains, per the paper)
