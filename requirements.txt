@@ -1,4 +1,5 @@
 eckity
 torch
 numpy
+scipy
 overrides

@@ -18,6 +18,7 @@ dependencies = [
     "eckity",
     "torch",
     "numpy",
+    "scipy",      # required by eckity at import time (fp_selection uses scipy.special.softmax)
     "overrides",
 ]
 
