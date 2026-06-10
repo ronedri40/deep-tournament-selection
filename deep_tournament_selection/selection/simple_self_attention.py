@@ -13,7 +13,7 @@ class RecombinationAttention(nn.Module):
         super().__init__()
         self.W_Q = nn.Linear(embed_dim, key_dim, bias=False)
         self.W_K = nn.Linear(embed_dim, key_dim, bias=False)
-        self.W_V = nn.Linear(embed_dim, 1, bias=False)  # produces scalar per token
+        self.W_V = nn.Linear(embed_dim, 1, bias=False)
         self.scale = key_dim ** 0.5
 
     def forward(self, Ft):
@@ -22,21 +22,16 @@ class RecombinationAttention(nn.Module):
         returns: w_t of shape [B, N] — a probability distribution
         """
 
-        # 1) Compute Q, K
-        Q = self.W_Q(Ft)  # [B, N, Dk]
-        K = self.W_K(Ft)  # [B, N, Dk]
+        Q = self.W_Q(Ft)
+        K = self.W_K(Ft)
 
-        # 2) Attention logits: QK^T / sqrt(Dk)
-        attn_logits = torch.matmul(Q, K.transpose(1, 2)) / self.scale  # [B, N, N]
-        A = F.softmax(attn_logits, dim=-1)  # self-attention over tokens
+        attn_logits = torch.matmul(Q, K.transpose(1, 2)) / self.scale
+        A = F.softmax(attn_logits, dim=-1)
 
-        # 3) Compute V = Ft W_V -> scalar per token
-        V = self.W_V(Ft).squeeze(-1)  # [B, N]
+        V = self.W_V(Ft).squeeze(-1)
 
-        # 4) Multiply A @ V
-        w_raw = torch.matmul(A, V.unsqueeze(-1)).squeeze(-1)  # [B, N]
+        w_raw = torch.matmul(A, V.unsqueeze(-1)).squeeze(-1)
 
-        # 5) Final probability distribution
-        w_t = F.softmax(w_raw, dim=-1)  # [B, N]
+        w_t = F.softmax(w_raw, dim=-1)
 
         return w_t

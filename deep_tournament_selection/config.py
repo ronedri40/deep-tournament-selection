@@ -24,22 +24,18 @@ class DTSConfig:
     n_layers: int = 2
     n_heads: int = 4
     learning_rate: float = 2e-3
-    final_lr: float = 1e-3            # linearly decayed to this
+    final_lr: float = 1e-3
     train_every_n_gens: int = 10
-    # Teacher forcing: start greedy (follow the tournament winner) and decay
-    # exponentially down to a 0.2 floor — a gradual transition from greedy
-    # behaviour to fully learned selection (paper).
     epsilon_greedy: float = 1.0
     epsilon_greedy_decay: float = 0.999
     min_epsilon: float = 0.2
 
 
-# Shared GA parameters (identical across domains, per the paper)
 POPULATION_SIZE = 100
 ELITISM = 2
 CROSSOVER_PROB = 0.5
-MUTATION_PROB = 0.5        # operator-level mutation probability
-FLIP_MUTATION_PROB = 0.1   # per-gene flip probability (Graph Coloring / Set Cover)
+MUTATION_PROB = 0.5
+FLIP_MUTATION_PROB = 0.1
 RUNS = 15
 
 
@@ -70,7 +66,7 @@ class GraphColoringConfig:
     mutation_prob: float = MUTATION_PROB
     flip_mutation_prob: float = FLIP_MUTATION_PROB
     penalty: float = 100.0
-    colors_margin: int = 10  # max colors = n_nodes - colors_margin
+    colors_margin: int = 10
     elitism: int = ELITISM
     runs: int = RUNS
 

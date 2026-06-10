@@ -38,14 +38,14 @@ class CachingEvaluator(SimpleIndividualEvaluator):
         key = tuple(individual.vector)
         if key in self.fitness_cache:
             self.hits += 1
-            self.fitness_cache.move_to_end(key)  # LRU touch
+            self.fitness_cache.move_to_end(key)
             return self.fitness_cache[key]
 
         self.misses += 1
         value = self.inner.evaluate_individual(individual)
         self.fitness_cache[key] = value
         if self.max_size is not None and len(self.fitness_cache) > self.max_size:
-            self.fitness_cache.popitem(last=False)  # evict oldest
+            self.fitness_cache.popitem(last=False)
         return value
 
     def cache_stats(self):

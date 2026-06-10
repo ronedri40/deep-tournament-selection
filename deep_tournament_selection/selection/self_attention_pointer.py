@@ -24,8 +24,6 @@ class SelfAttentionPointer(nn.Module):
         self.sampling_method = sampling_method
         self.teacher_forcing_strategy = teacher_forcing_strategy
 
-        # -------- Self-attention pointer scorer --------
-        # Produces w_t ∈ [B, N] distribution for each pointer step
         self.recomb_attn = RecombinationAttention(embed_dim=d_model,
                                                   key_dim=d_model // 4)
         self.pos_emb = nn.Embedding(max_selection_sequence_length, d_model)
@@ -43,7 +41,6 @@ class SelfAttentionPointer(nn.Module):
         if pointer_len is None:
             pointer_len = self.pointer_len
 
-        # ---- Encode sentences ----
         H = sent_embeds
 
         if population_order is not None and self.use_rank_embeddings:
@@ -52,17 +49,14 @@ class SelfAttentionPointer(nn.Module):
 
         logits = []
         sampled_idxs = []
-        w_t = self.recomb_attn(H)  # [B, N]
-        log_probs = torch.log(w_t + self.log_stability)  # log-probs for Categorical
+        w_t = self.recomb_attn(H)
+        log_probs = torch.log(w_t + self.log_stability)
 
         for t in range(pointer_len):
 
-            # ---- Self-attention pointer distribution ----
-            # RecombinationAttention returns w_t = softmax(...)
 
             logits.append(log_probs)
 
-            # ---- Sample or teacher-force ----
             if self.teacher_forcing_strategy == 'hard':
                 idx = self.hard_epsilon_greedy(teacher_forcing, w_t, t, epsilon_greedy)
             else:
@@ -70,14 +64,14 @@ class SelfAttentionPointer(nn.Module):
 
             sampled_idxs.append(idx)
 
-        logits = torch.stack(logits, dim=1)  # [B, pointer_len, N]
-        sampled_idxs = torch.stack(sampled_idxs, dim=1)  # [B, pointer_len]
+        logits = torch.stack(logits, dim=1)
+        sampled_idxs = torch.stack(sampled_idxs, dim=1)
 
         return logits, sampled_idxs
 
     def hard_epsilon_greedy(self, teacher_forcing, w_t, t, epsilon_greedy):
         if (teacher_forcing is not None) and (torch.rand(1).item() < epsilon_greedy):
-            idx = teacher_forcing[:, t]  # hard blending -> take all teacher forcing indices
+            idx = teacher_forcing[:, t]
             return idx
 
         return self.sample_from_attention_dist(w_t)
@@ -94,8 +88,7 @@ class SelfAttentionPointer(nn.Module):
         if teacher_forcing is None:
             return self.sample_from_attention_dist(w_t)
 
-        # soft blending -> sample from a mixture of teacher forcing and model distribution
-        epsilon_greedy_mask = (torch.rand(w_t.size(0)) < epsilon_greedy).to(w_t.device)  # [B]
-        idx_model = self.sample_from_attention_dist(w_t)  # [B]
-        idx = torch.where(epsilon_greedy_mask, teacher_forcing[:, t], idx_model)  # [B]
+        epsilon_greedy_mask = (torch.rand(w_t.size(0)) < epsilon_greedy).to(w_t.device)
+        idx_model = self.sample_from_attention_dist(w_t)
+        idx = torch.where(epsilon_greedy_mask, teacher_forcing[:, t], idx_model)
         return idx

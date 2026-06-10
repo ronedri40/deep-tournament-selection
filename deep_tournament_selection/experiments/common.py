@@ -51,11 +51,11 @@ def build_dts_operator(
         n_heads=n_heads,
         n_layers=n_layers,
         dim_feedforward=dim_feedforward,
-        max_pointers=population_size,  # rank embedding must index every individual
+        max_pointers=population_size,
     )
     decoder = SelfAttentionPointer(
         pointer_len=population_size,
-        d_model=latent_dim,  # must match the encoder's latent dimension
+        d_model=latent_dim,
     )
 
     def teacher_forcing(pop, n_select, fit_dict):

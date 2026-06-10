@@ -41,11 +41,10 @@ class GraphColoringEvaluator(SimpleIndividualEvaluator):
         self.n_nodes = n_nodes
         self.n_edges = n_edges
         self.penalty = penalty
-        # Build a 0-indexed edge list for vectorized conflict counting.
         u, v = [], []
         for node, neighbors in edges_information.items():
             for nb in neighbors:
-                if node < nb:  # each undirected edge once
+                if node < nb:
                     u.append(node - 1)
                     v.append(nb - 1)
         self.edge_u = np.array(u, dtype=np.int64)
@@ -55,8 +54,6 @@ class GraphColoringEvaluator(SimpleIndividualEvaluator):
         colors = np.asarray(individual.vector)
         num_colors = len(np.unique(colors))
         conflict_edges = colors[self.edge_u] == colors[self.edge_v]
-        # nodes that have at least one same-colored neighbor (per-node penalty,
-        # matching the original get_coloring_fitness)
         conflicting_nodes = np.unique(
             np.concatenate([self.edge_u[conflict_edges], self.edge_v[conflict_edges]])
         )

@@ -23,8 +23,7 @@ class PopulationToVecTransformer(nn.Module):
         )
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=n_layers)
         self.proj = nn.Linear(emb_dim, latent_dim)
-        # Embedding for pointer indices fed as tokens to decoder
-        self.rank_pos_emb = nn.Embedding(max_pointers, latent_dim)  # sentence indices
+        self.rank_pos_emb = nn.Embedding(max_pointers, latent_dim)
         self.pool_attn = nn.Linear(emb_dim, 1, bias=False)
         self.use_rank_embeddings = use_rank_embeddings
         self.canonicalize = canonicalize
@@ -39,14 +38,12 @@ class PopulationToVecTransformer(nn.Module):
 
         b, n_sent, seq_len = x.shape
 
-        # Flatten sentences across batch dimension
-        x = x.reshape(b * n_sent, seq_len)  # [B*N, seq_len]
+        x = x.reshape(b * n_sent, seq_len)
 
         if self.canonicalize:
             x = self.canonicalize_sequences(x)
 
-        # Token embedding
-        tok = self.token_emb(x)  # [B*N, seq_len, emb_dim]
+        tok = self.token_emb(x)
         if seq_len > self.max_gene_positions:
             raise ValueError(
                 f"Sequence length {seq_len} exceeds max_gene_positions={self.max_gene_positions}"
@@ -55,18 +52,14 @@ class PopulationToVecTransformer(nn.Module):
 
         h = tok
 
-        # Transformer encoder
-        h = self.encoder(h)  # [B*N, seq_len, emb_dim]
+        h = self.encoder(h)
 
-        # Learn to focus on the most informative loci when summarizing an individual.
-        pool_logits = self.pool_attn(h).squeeze(-1)  # [B*N, seq_len]
+        pool_logits = self.pool_attn(h).squeeze(-1)
         pool_weights = pool_logits.softmax(dim=1)
-        pooled = torch.sum(h * pool_weights.unsqueeze(-1), dim=1)  # [B*N, emb_dim]
+        pooled = torch.sum(h * pool_weights.unsqueeze(-1), dim=1)
 
-        # Project to latent_dim
-        out = self.proj(pooled)  # [B*N, latent_dim]
+        out = self.proj(pooled)
 
-        # Restore original shape
         out_embedding = out.reshape(b, n_sent, -1)
 
         if population_order is not None and self.use_rank_embeddings:

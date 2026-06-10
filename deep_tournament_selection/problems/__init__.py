@@ -10,7 +10,6 @@ from .operators import (
     RSMMutation,
 )
 
-# Directory holding the bundled benchmark instances.
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 
 __all__ = [

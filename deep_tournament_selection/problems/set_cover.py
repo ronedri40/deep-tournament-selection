@@ -35,7 +35,7 @@ def _parse_single_case(block):
     m, n = int(header[0]), int(header[1])
     remaining = lines[1:]
 
-    if len(remaining) == n:  # Format B: one line per column
+    if len(remaining) == n:
         costs, col_rows = [], []
         for j in range(n):
             tokens = remaining[j].split()
@@ -48,11 +48,11 @@ def _parse_single_case(block):
                 row_cover[r - 1].append(j + 1)
         return {"m": m, "n": n, "costs": costs, "row_cover": row_cover}
 
-    elif len(remaining) == m:  # Format C: one line per row, unit costs
+    elif len(remaining) == m:
         return {"m": m, "n": n, "costs": [1] * n,
                 "row_cover": [list(map(int, remaining[i].split())) for i in range(m)]}
 
-    else:  # Format A: SCP / Beasley
+    else:
         cost_tokens, idx = [], 0
         while idx < len(remaining) and len(cost_tokens) < n:
             cost_tokens.extend(remaining[idx].split())
@@ -80,7 +80,6 @@ class SetCoverEvaluator(SimpleIndividualEvaluator):
         self.costs = np.array(case["costs"])
         self.penalty = penalty
         self.weighted = weighted
-        # row_cover as sets of 0-indexed columns for fast intersection checks
         self.row_cover = [set(c - 1 for c in cols) for cols in case["row_cover"]]
 
     def evaluate_individual(self, individual):

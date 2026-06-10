@@ -37,7 +37,7 @@ def main():
     for name, path in resolve_instances("graph_coloring", args.instance, cfg.instances):
         sizing = GraphColoringEvaluator(path, penalty=cfg.penalty)
         n_nodes = sizing.n_nodes
-        max_colors = n_nodes - cfg.colors_margin  # gene values in [0, max_colors]
+        max_colors = n_nodes - cfg.colors_margin
         print(f"\n=== Graph Coloring {name}  (nodes={n_nodes}, max_colors={max_colors})  "
               f"selection={args.selection} ===")
         for run in range(args.runs):
@@ -45,8 +45,6 @@ def main():
             creator = GAIntVectorCreator(length=n_nodes, bounds=(0, max_colors))
             operators = [
                 VectorUniformCrossover(probability=args.crossover_prob),
-                # uniform mutation: applied with prob `mutation_prob`; each gene
-                # reassigned with prob `flip_mutation_prob`
                 IntVectorOnePointMutation(probability=args.mutation_prob,
                                           probability_for_each=args.flip_mutation_prob),
             ]

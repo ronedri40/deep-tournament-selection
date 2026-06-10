@@ -32,7 +32,6 @@ class ElitistBreeder(SimpleBreeder):
             )
             self.selected_individuals = nextgen_population
 
-            # Protect the elites: apply operators ONLY to the offspring.
             elites = nextgen_population[:num_elites]
             offspring = self._apply_operators(
                 subpopulation.get_operators_sequence(),

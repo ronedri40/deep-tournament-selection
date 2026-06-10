@@ -16,9 +16,6 @@ from eckity.creators.ga_creators.int_vector_creator import GAIntVectorCreator
 from eckity.genetic_operators.genetic_operator import GeneticOperator
 
 
-# --------------------------------------------------------------------------- #
-# Uniform crossover (bit / int vectors)
-# --------------------------------------------------------------------------- #
 class VectorUniformCrossover(GeneticOperator):
     """Uniform crossover: swap each gene between the two parents with prob 0.5.
 
@@ -39,9 +36,6 @@ class VectorUniformCrossover(GeneticOperator):
         return individuals
 
 
-# --------------------------------------------------------------------------- #
-# Permutation support (TSP)
-# --------------------------------------------------------------------------- #
 class PermutationVectorCreator(GAIntVectorCreator):
     """Creates IntVector individuals initialized as random permutations of 0..length-1."""
 

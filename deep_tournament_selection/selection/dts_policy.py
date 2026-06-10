@@ -39,7 +39,6 @@ class DTSPolicy:
                  final_lr=None
                  ):
 
-        # need to recalculate gradients in pending trajectories after each epoch  (because model has changed)
         assert device in ['cpu', 'cuda'], "device must be either 'cpu' or 'cuda'"
         assert train_every_n_gens > 0, "train_every_n_gens must be greater than 0"
         assert (clip_grad_norm is
@@ -113,7 +112,6 @@ class DTSPolicy:
             n_to_select,
             fitness_dict)
 
-        # sum log prob over tournaments
         total_log_prob = get_trajectory_probability_from_log_probs(trajectory_log_probabilities,
                                                                    selected_population_indices).sum().unsqueeze(0)
 
@@ -147,29 +145,22 @@ class DTSPolicy:
 
         embedded_population = self.pop_to_vec_transformer(populations_tensor.unsqueeze(0), population_order).squeeze(0)
 
-        # if np.random.random() < self.epsilon_greedy:
-        # converting population indexes to indices within each tournament
         indices_per_tournament = np.argmax(
             all_tournaments_indexes == tournament_selection_prediction_indexes[:, None],
             axis=1)
         teacher_forcing_indexes = torch.tensor(indices_per_tournament, device=self.device, dtype=torch.long).view(
             -1, 1)
-        # else:
-        #     teacher_forcing_indexes = None
 
         tournament_populations = populations_tensor[all_tournaments_indexes]
-        # avoid recalculating the embeddings for the tournament population
         tournament_populations_embeddings = embedded_population[all_tournaments_indexes]
         fitness_values_per_tournament = fitness_values[all_tournaments_indexes]
 
         trajectory_log_probabilities, selected_population_indices = self.predict_batch_selection(tournament_populations,
                                                                                                  fitness_values_per_tournament,
                                                                                                  n_to_select=1,
-                                                                                                 # per tournament
                                                                                                  teacher_forcing_indexes=teacher_forcing_indexes,
                                                                                                  embedded_population=tournament_populations_embeddings)
 
-        # align tournament index to selected population
         selected_population_after_tournament = tournament_populations[
             torch.arange(tournament_populations.shape[0]), selected_population_indices.squeeze(1)].cpu().numpy()
 
@@ -185,8 +176,6 @@ class DTSPolicy:
                                         dtype=torch.long)
 
         if teacher_forcing_indexes is not None:
-            # as_tensor avoids the "copy construct from a tensor" warning when the
-            # input is already a tensor (it is, when called from the tournament path).
             teacher_forcing_indexes = torch.as_tensor(teacher_forcing_indexes, device=self.device, dtype=torch.long)
 
         trajectory_log_probabilities, selected_population_indices = self.pointer_transformer(embedded_population,

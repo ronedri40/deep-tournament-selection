@@ -44,8 +44,6 @@ def main():
             creator = GABitStringVectorCreator(length=n_columns)
             operators = [
                 VectorUniformCrossover(probability=args.crossover_prob),
-                # uniform mutation: applied with prob `mutation_prob`; each bit
-                # flipped with prob `flip_mutation_prob`
                 BitStringVectorNFlipMutation(probability=args.mutation_prob,
                                              probability_for_each=args.flip_mutation_prob,
                                              n=n_columns),
