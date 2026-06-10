@@ -7,13 +7,13 @@ import logging
 import os
 
 from eckity.algorithms.simple_evolution import SimpleEvolution
-from eckity.breeders.simple_breeder import SimpleBreeder
 from eckity.subpopulation import Subpopulation
 from eckity.statistics.best_average_worst_statistics import BestAverageWorstStatistics
 from eckity.genetic_operators.selections.tournament_selection import TournamentSelection
 
 from .common import build_dts_operator
 from ..caching_evaluator import CachingEvaluator
+from ..elitist_breeder import ElitistBreeder
 from ..logging_utils import JsonStatistics
 
 
@@ -69,7 +69,7 @@ def run_one(label, creator, evaluator, operators, selection, *,
             operators_sequence=operators,
             selection_methods=[(selection, 1)],
         ),
-        breeder=SimpleBreeder(),
+        breeder=ElitistBreeder(),
         max_workers=max_workers,
         max_generation=generations,
         statistics=stats,
