@@ -8,7 +8,6 @@ from .dts_aux import get_ranks_from_fitness_values, \
     get_reward_from_fitness_scores, get_trajectory_probability_from_log_probs
 from .tournament_utils import get_fit, tournament_selection
 from .population_to_vec_transformer import PopulationToVecTransformer
-from .replay_buffer import ReplayBuffer, ReplaySamples
 from .self_attention_pointer import SelfAttentionPointer
 
 
@@ -36,7 +35,6 @@ class DTSPolicy:
                  teacher_forcing_algorithm=None,
                  custom_reward_function=None,
                  amsgrad=True,
-                 replay_buffer=None,
                  center_only=False,
                  final_lr=None
                  ):
@@ -92,7 +90,6 @@ class DTSPolicy:
         self.center_only = center_only
 
         self.custom_reward_function = custom_reward_function
-        self.replay_buffer: ReplayBuffer | None = replay_buffer
         self.pending_trajectories_log_probs = []
         self.trajectory_probabilities = []
         self.trajectory_rewards = []
@@ -176,14 +173,6 @@ class DTSPolicy:
         selected_population_after_tournament = tournament_populations[
             torch.arange(tournament_populations.shape[0]), selected_population_indices.squeeze(1)].cpu().numpy()
 
-        if self.replay_buffer is not None:
-            self.replay_buffer.log_to_buffer(
-                population,
-                fitness_values,
-                all_tournaments_indexes,
-                selected_population_indices.detach().cpu().numpy()
-            )
-
         return trajectory_log_probabilities, selected_population_after_tournament, selected_population_indices
 
     def predict_batch_selection(self, population: np.ndarray | Tensor, fitness_values: np.ndarray, n_to_select: int,
@@ -217,56 +206,6 @@ class DTSPolicy:
             reward = self.custom_reward_function(cur_gen_fitness_metric, prev_gen_fitness_metric, population)
             self.log_trajectory_to_memory(self.pending_trajectories_log_probs.pop(0), rewards=[reward])
 
-    def sample_gradients_from_replay_buffer(self):
-        if (self.replay_buffer is None) or (not self.replay_buffer.is_sample_ready()):
-            return None
-
-        replay_samples: ReplaySamples = self.replay_buffer.sample_from_buffer()
-        replay_log_probabilities = []
-        replay_rewards = []
-        for sample_index in range(self.replay_buffer.sample_size):
-            reward = self.get_reward_from_replay_sample(replay_samples, sample_index)
-            log_probs = self.get_gradients_from_replay_sample(replay_samples, sample_index)
-            replay_log_probabilities.append(log_probs)
-            replay_rewards.append(torch.tensor([reward], device=self.device))
-
-        all_replay_traj_proba = torch.cat(replay_log_probabilities).to(self.device)
-        all_replay_rewards = torch.cat(replay_rewards).to(self.device)
-        replay_loss = self.get_loss(all_replay_rewards, all_replay_traj_proba)
-        return replay_loss
-
-    def get_gradients_from_replay_sample(self, replay_samples: ReplaySamples, sample_index: int):
-        population = replay_samples.population[sample_index]
-        fitness_values: np.ndarray = replay_samples.fitness[sample_index]
-        all_tournaments_indexes = replay_samples.tournament[sample_index]
-        teacher_forcing_indexes = replay_samples.predicted_tournament_indices[sample_index]
-
-        population_order = torch.tensor(get_ranks_from_fitness_values(fitness_values.reshape(1, -1)),
-                                        device=self.device,
-                                        dtype=torch.long)
-        populations_tensor = torch.tensor(population, device=self.device, dtype=torch.long)
-        embedded_population = self.pop_to_vec_transformer(populations_tensor.unsqueeze(0), population_order).squeeze(0)
-
-        tournament_populations = populations_tensor[all_tournaments_indexes]
-        tournament_populations_embeddings = embedded_population[all_tournaments_indexes]
-        fitness_values_per_tournament = fitness_values[all_tournaments_indexes]
-        trajectory_log_probabilities, selected_population_indices = self.predict_batch_selection(
-            tournament_populations,
-            fitness_values_per_tournament,
-            n_to_select=1,
-            teacher_forcing_indexes=torch.tensor(teacher_forcing_indexes, device=self.device, dtype=torch.long),
-            embedded_population=tournament_populations_embeddings
-        )
-        final_traj_prob = get_trajectory_probability_from_log_probs(trajectory_log_probabilities,
-                                                                    selected_population_indices).sum().unsqueeze(0)
-        return final_traj_prob
-
-    def get_reward_from_replay_sample(self, replay_samples: ReplaySamples, sample_index: int):
-        generation_fitness = replay_samples.fitness[sample_index]
-        next_generation_fitness = replay_samples.next_generation_fitness[sample_index]
-        trajectory_reward = self.custom_reward_function(next_generation_fitness, generation_fitness)
-        return trajectory_reward
-
     def get_loss(self, all_rewards, all_traj_proba, numerical_stability=1e-10):
         if self.normalize_reward_batches:
             advantages = (all_rewards - torch.mean(all_rewards))
@@ -291,10 +230,6 @@ class DTSPolicy:
         self.optimizer.zero_grad()
 
         loss = self.get_loss(all_rewards, all_traj_proba, numerical_stability)
-
-        replay_loss = self.sample_gradients_from_replay_buffer()
-        if replay_loss is not None:
-            loss = loss + self.replay_buffer.get_replay_weight() * replay_loss
 
         loss.backward()
         loss_value = loss.item()
