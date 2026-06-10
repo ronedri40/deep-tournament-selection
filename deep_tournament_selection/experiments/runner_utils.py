@@ -14,7 +14,7 @@ from eckity.genetic_operators.selections.tournament_selection import TournamentS
 from .common import build_dts_operator
 from ..caching_evaluator import CachingEvaluator
 from ..elitist_breeder import ElitistBreeder
-from ..logging_utils import JsonStatistics
+from ..logging_utils import FileLogger
 
 
 def make_selection(kind, population_size, vocab_size, dts_cfg=None, device="cpu"):
@@ -55,7 +55,7 @@ def run_one(label, creator, evaluator, operators, selection, *,
     if use_cache:
         evaluator = CachingEvaluator(evaluator)
 
-    stats = [JsonStatistics(output_path)]
+    stats = [FileLogger(output_path)]
     if not quiet:
         stats.append(BestAverageWorstStatistics())
 
