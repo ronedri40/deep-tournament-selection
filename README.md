@@ -96,8 +96,8 @@ python -m deep_tournament_selection.experiments.tsp            --instance att48.
 # baseline comparison on the same setup
 python -m deep_tournament_selection.experiments.tsp --instance att48.tsp --generations 200 --selection tournament
 
-# sweep everything (paper protocol uses --runs 15)
-python run_experiments.py --problems all --selection both --runs 3 --generations 500
+# sweep everything (all problems by default; paper protocol uses --runs 15)
+python run_experiments.py --selection both --runs 3 --generations 500
 ```
 
 Common flags: `--instance <file|all>`, `--selection dts|tournament`, `--population-size`,
