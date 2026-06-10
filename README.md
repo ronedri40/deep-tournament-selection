@@ -1,49 +1,12 @@
 # Deep Tournament Selection (DTS) for Genetic Algorithms
 
-Reference implementation of **"Deep Tournament Selection for Genetic Algorithms"**
+Reference implementation of the paper **"Deep Tournament Selection for Genetic Algorithms"**
 (Eliad Shem-Tov, Ron Edri, Achiya Elyasaf — Ben-Gurion University of the Negev).
-
-DTS is a **learned, domain-independent selection operator** for genetic algorithms. It reframes
-tournament selection as a Markov Decision Process optimized online with policy-gradient
-reinforcement learning, and is implemented as a drop-in [EC-KitY](https://github.com/EC-KitY/EC-KitY)
-`SelectionMethod`.
+📄 **Paper:** _link coming soon_.
 
 <p align="center">
   <img src="images/dts_arch.png" alt="Deep Tournament Selection architecture" width="640">
 </p>
-
-## Abstract
-
-In Genetic Algorithms (GAs), the selection operator plays a critical role in balancing exploration
-and exploitation. However, classical and adaptive selection mechanisms largely rely on static rules
-or handcrafted heuristics that fail to adapt to the real-time dynamics of the evolving population. In
-this work, we introduce **Deep Tournament Selection (DTS)**, a novel domain-independent selection
-operator that reformulates tournament selection as a Markov Decision Process optimized via
-reinforcement learning. DTS evaluates candidate solutions in a tournament using a Transformer encoder
-augmented with global and local rank-based positional encodings, along with a self-attention pointer
-mechanism. The policy is trained fully online using policy-gradient reinforcement learning **without
-requiring additional fitness evaluations**, enabling the operator to dynamically adjust its selection
-pressure. We evaluate DTS on three canonical combinatorial optimization domains — **Graph Coloring,
-Set Cover, and the Traveling Salesman Problem** — and show faster convergence, improved solution
-quality, and robust performance compared to classical and dynamic selection baselines, while
-introducing negligible computational overhead and preserving population diversity.
-
-## Method
-
-DTS operates through three components (`deep_tournament_selection/selection/`):
-
-1. **Fitness-Augmented Embedding** — a Transformer encoder maps each individual (an integer vector)
-   to a latent vector, augmented with **global** (population-level) and **local** (within-tournament)
-   rank-based positional encodings that inject relative fitness information.
-2. **Contextual Tournament Evaluation** — a self-attention pointer mechanism jointly scores the
-   candidates in each tournament and produces a stochastic selection policy.
-3. **Selection as an MDP** — parent sampling is framed as an RL problem and the policy is trained
-   online with policy gradients, using the improvement in the top-*m* individuals between consecutive
-   generations as reward (no extra fitness evaluations).
-
-The whole stack is wrapped in a thin EC-KitY adapter,
-`selection/eckity_adapter.py::DeepTournamentSelection(SelectionMethod)`, so it slots into any GA as a
-single line: `selection_methods=[(dts, 1)]`.
 
 ## Repository layout
 
