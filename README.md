@@ -67,8 +67,20 @@ python run_experiments.py --selection both --runs 3 --generations 500
 ```
 
 Common flags: `--instance <file|all>`, `--selection dts|tournament`, `--population-size`,
-`--generations`, `--runs`, `--crossover-prob`, `--mutation-prob`, `--output`, `--device`, `--quiet`.
-Per-generation best/avg fitness is written as JSON under `--output` (default `runs/`).
+`--generations`, `--runs`, `--crossover-prob`, `--mutation-prob`, `--output`, `--device`, `--quiet`,
+`--no-diversity`.
+
+**Results are saved locally** by the `FileLogger`, one JSON per run under `--output` (default
+`runs/`):
+
+```
+runs/<problem>/<instance>/<selection>/run_<k>.json   # per-generation metrics
+runs/summary.csv                                      # best-of-run table (run_experiments.py only)
+```
+
+Each `run_<k>.json` holds per-generation arrays: `mean`, `std`, `median`, `max` (best), `min`
+(worst), `time` (seconds/generation), and `population_diversity` (domain-specific; disable with
+`--no-diversity`).
 
 ### Using DTS in your own EC-KitY experiment
 

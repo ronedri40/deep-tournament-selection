@@ -49,6 +49,11 @@ from deep_tournament_selection.problems import (
     TSPEvaluator,
     VectorUniformCrossover,
 )
+from deep_tournament_selection.problems.diversity import (
+    graph_coloring_diversity,
+    set_cover_diversity,
+    tsp_edge_diversity,
+)
 from deep_tournament_selection.experiments.runner_utils import (
     configure_logging,
     make_selection,
@@ -99,12 +104,15 @@ def build_set_cover(path, cfg, cross_prob, mut_prob):
 
 PROBLEMS = {
     "tsp": dict(cfg=TSPConfig(), data="tsp", build=build_tsp,
-                score=lambda f: -f, score_name="tour_length"),
+                score=lambda f: -f, score_name="tour_length",
+                diversity=tsp_edge_diversity),
     "graph_coloring": dict(cfg=GraphColoringConfig(), data="graph_coloring",
                            build=build_graph_coloring,
-                           score=lambda f: f, score_name="fitness"),
+                           score=lambda f: f, score_name="fitness",
+                           diversity=graph_coloring_diversity),
     "set_cover": dict(cfg=SetCoverConfig(), data="set_cover", build=build_set_cover,
-                      score=lambda f: f, score_name="fitness"),
+                      score=lambda f: f, score_name="fitness",
+                      diversity=set_cover_diversity),
 }
 
 
@@ -144,6 +152,8 @@ def main():
     p.add_argument("--full", action="store_true",
                    help="full paper protocol: per-problem config instances/runs/generations")
     p.add_argument("--quiet", action="store_true")
+    p.add_argument("--no-diversity", action="store_true",
+                   help="skip population-diversity logging (faster, esp. on large TSP)")
     args = p.parse_args()
     configure_logging(quiet=True if args.quick else args.quiet)
 
@@ -182,7 +192,8 @@ def main():
                     res = run_one(f"{prob_name}/{inst_name}/{sel}/run{run}",
                                   creator, ev, operators, selection,
                                   population_size=population_size, generations=generations,
-                                  elitism=cfg.elitism, output_path=out, quiet=True)
+                                  elitism=cfg.elitism, output_path=out, quiet=True,
+                                  diversity_fn=None if args.no_diversity else spec["diversity"])
                     dt = time.time() - t0
                     score = spec["score"](res["best_fitness"])
                     row = dict(problem=prob_name, instance=inst_name, size=size_label,
