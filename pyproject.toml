@@ -22,6 +22,10 @@ dependencies = [
     "overrides",
 ]
 
+[project.optional-dependencies]
+# Needed only to render figures (make_paper_figures.py): pip install -e ".[plot]"
+plot = ["matplotlib", "pandas"]
+
 [tool.setuptools.packages.find]
 include = ["deep_tournament_selection*"]
 

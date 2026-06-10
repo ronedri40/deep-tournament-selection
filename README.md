@@ -124,6 +124,20 @@ Runs are cached under `runs/paper_figures/` (resumable), and the figure is writt
 `figures/reproduction_fitness_all_domains.{png,pdf}`. Set Cover dominates CPU runtime because DTS's
 neural selection runs ~4 s/generation there (the paper used a CUDA GPU).
 
+### On a GPU cluster (SLURM)
+
+DTS runs much faster on a CUDA GPU (`--device cuda`). A ready-to-submit batch script is provided:
+
+```bash
+# from the repository root on the cluster:
+sbatch scripts/run_paper_figures.slurm
+```
+
+It creates a `.venv`, installs the package with plotting extras (`pip install -e ".[plot]"`), checks
+that a GPU is visible, then runs `make_paper_figures.py --mode demo --runs 3 --device cuda`. Edit the
+`#SBATCH --partition=...` line to match your cluster, and `MODE`/`RUNS` at the top of the script to
+change scale (`paper` for the full 6000-gen settings). The figure lands in `figures/`.
+
 ## Citation
 
 > **Note:** the paper has not been published yet. A citation (BibTeX) will be added here once it is
