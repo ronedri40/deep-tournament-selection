@@ -2,7 +2,7 @@
 
 From "Deep Tournament Selection for Genetic Algorithms" (Shem-Tov, Edri, Elyasaf):
 identical GA parameters across domains — population 100, elitism 2, crossover
-probability 0.5, uniform mutation probability 0.01, 15 repeats; 6000 generations
+probability 0.5, mutation probability 0.5 with per-gene flip 0.1, 15 repeats; 6000 generations
 for Graph Coloring and Set Cover, 1000 for TSP. DTS uses tournament size k=5, a
 2-layer / 4-head Transformer encoder (feedforward 256, latent 32), Adam with
 lr 2e-3 linearly decayed to 1e-3, reward over the top-m=5 individuals, and model
@@ -38,7 +38,8 @@ class DTSConfig:
 POPULATION_SIZE = 100
 ELITISM = 2
 CROSSOVER_PROB = 0.5
-MUTATION_PROB = 0.01      # uniform mutation probability (per gene for GC/SC)
+MUTATION_PROB = 0.5        # operator-level mutation probability
+FLIP_MUTATION_PROB = 0.1   # per-gene flip probability (Graph Coloring / Set Cover)
 RUNS = 15
 
 
@@ -67,6 +68,7 @@ class GraphColoringConfig:
     generations: int = 6000
     crossover_prob: float = CROSSOVER_PROB
     mutation_prob: float = MUTATION_PROB
+    flip_mutation_prob: float = FLIP_MUTATION_PROB
     penalty: float = 100.0
     colors_margin: int = 10  # max colors = n_nodes - colors_margin
     elitism: int = ELITISM
@@ -83,6 +85,7 @@ class SetCoverConfig:
     generations: int = 6000
     crossover_prob: float = CROSSOVER_PROB
     mutation_prob: float = MUTATION_PROB
+    flip_mutation_prob: float = FLIP_MUTATION_PROB
     penalty: float = 100.0
     weighted: bool = False
     elitism: int = ELITISM

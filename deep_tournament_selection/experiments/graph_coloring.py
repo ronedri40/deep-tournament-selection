@@ -27,6 +27,7 @@ def main():
     p.add_argument("--runs", type=int, default=1)
     p.add_argument("--crossover-prob", type=float, default=cfg.crossover_prob)
     p.add_argument("--mutation-prob", type=float, default=cfg.mutation_prob)
+    p.add_argument("--flip-mutation-prob", type=float, default=cfg.flip_mutation_prob)
     p.add_argument("--output", default="runs")
     p.add_argument("--device", default="cpu")
     p.add_argument("--quiet", action="store_true")
@@ -44,9 +45,10 @@ def main():
             creator = GAIntVectorCreator(length=n_nodes, bounds=(0, max_colors))
             operators = [
                 VectorUniformCrossover(probability=args.crossover_prob),
-                # uniform mutation: each gene reassigned with prob `mutation_prob`
-                IntVectorOnePointMutation(probability=1.0,
-                                          probability_for_each=args.mutation_prob),
+                # uniform mutation: applied with prob `mutation_prob`; each gene
+                # reassigned with prob `flip_mutation_prob`
+                IntVectorOnePointMutation(probability=args.mutation_prob,
+                                          probability_for_each=args.flip_mutation_prob),
             ]
             selection = make_selection(args.selection, args.population_size,
                                        vocab_size=max_colors + 1, dts_cfg=dts, device=args.device)
