@@ -109,6 +109,21 @@ print(evaluator.cache_stats())   # {'hits': ..., 'misses': ..., 'hit_rate': ...}
 The paper's fitness and population-diversity plots are in [`figures/`](figures/)
 (`fitness_graph_dts_all_domains.pdf`, per-domain plots, and `hamming_distance_all_domains.pdf`).
 
+To **reproduce the fitness convergence figure locally**, run the representative instances from the
+paper (Graph Coloring `myciel7`, Set Cover `scp65`, TSP `berlin52`) with DTS and the Tournament
+baseline and plot `log(fitness)` per generation:
+
+```bash
+python make_paper_figures.py --mode demo --runs 3     # ~4-5h on CPU, shows the published shape
+python make_paper_figures.py --mode paper --runs 3    # exact paper gens (Set Cover ~20h on CPU!)
+python make_paper_figures.py --mode quick --runs 2    # ~30 min sanity check
+python make_paper_figures.py --plot-only              # re-plot cached runs, no recompute
+```
+
+Runs are cached under `runs/paper_figures/` (resumable), and the figure is written to
+`figures/reproduction_fitness_all_domains.{png,pdf}`. Set Cover dominates CPU runtime because DTS's
+neural selection runs ~4 s/generation there (the paper used a CUDA GPU).
+
 ## Citation
 
 > **Note:** the paper has not been published yet. A citation (BibTeX) will be added here once it is
