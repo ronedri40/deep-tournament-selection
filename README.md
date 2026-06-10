@@ -8,7 +8,7 @@ Implemented as a thin EC-KitY adapter (`selection/eckity_adapter.py`), DTS drops
 line: `selection_methods=[(dts, 1)]`.
 
 <p align="center">
-  <img src="images/dts_arch.png" alt="Deep Tournament Selection architecture" width="640">
+  <img src="images/dts_arch.png" alt="Deep Tournament Selection architecture" width="800">
 </p>
 
 ## Repository layout
