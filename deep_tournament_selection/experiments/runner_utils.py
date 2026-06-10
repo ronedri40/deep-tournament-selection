@@ -46,7 +46,7 @@ def make_selection(kind, population_size, vocab_size, dts_cfg=None, device="cpu"
 
 def run_one(label, creator, evaluator, operators, selection, *,
             population_size, generations, elitism, output_path=None,
-            use_cache=True, quiet=False, max_workers=1):
+            diversity_fn=None, use_cache=True, quiet=False, max_workers=1):
     """Run a single evolution and return a result dict.
 
     All problems here are framed as MAXIMIZATION (fitness is negated cost), so
@@ -55,7 +55,7 @@ def run_one(label, creator, evaluator, operators, selection, *,
     if use_cache:
         evaluator = CachingEvaluator(evaluator)
 
-    stats = [FileLogger(output_path)]
+    stats = [FileLogger(output_path, diversity_fn=diversity_fn)]
     if not quiet:
         stats.append(BestAverageWorstStatistics())
 

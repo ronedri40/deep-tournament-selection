@@ -14,6 +14,7 @@ from eckity.genetic_operators.mutations.vector_random_mutation import IntVectorO
 
 from ..config import GraphColoringConfig, DTSConfig
 from ..problems import GraphColoringEvaluator, VectorUniformCrossover
+from ..problems.diversity import graph_coloring_diversity
 from .runner_utils import make_selection, run_one, resolve_instances, configure_logging
 
 
@@ -31,6 +32,7 @@ def main():
     p.add_argument("--output", default="runs")
     p.add_argument("--device", default="cpu")
     p.add_argument("--quiet", action="store_true")
+    p.add_argument("--no-diversity", action="store_true", help="skip population-diversity logging")
     args = p.parse_args()
     configure_logging(args.quiet)
 
@@ -54,7 +56,8 @@ def main():
             res = run_one(f"gc/{name}/{args.selection}/run{run}", creator,
                           evaluator, operators, selection,
                           population_size=args.population_size, generations=args.generations,
-                          elitism=cfg.elitism, output_path=out, quiet=args.quiet)
+                          elitism=cfg.elitism, output_path=out, quiet=args.quiet,
+                          diversity_fn=None if args.no_diversity else graph_coloring_diversity)
             print(f"  run {run}: best fitness = {res['best_fitness']:.0f}  "
                   f"(higher is better: -colors - {cfg.penalty:.0f}*conflicts)")
 

@@ -11,6 +11,7 @@ import os
 
 from ..config import TSPConfig, DTSConfig
 from ..problems import TSPEvaluator, PermutationVectorCreator, SCXCrossover, RSMMutation
+from ..problems.diversity import tsp_edge_diversity
 from .runner_utils import make_selection, run_one, resolve_instances, configure_logging
 
 
@@ -27,6 +28,7 @@ def main():
     p.add_argument("--output", default="runs")
     p.add_argument("--device", default="cpu")
     p.add_argument("--quiet", action="store_true")
+    p.add_argument("--no-diversity", action="store_true", help="skip population-diversity logging")
     args = p.parse_args()
     configure_logging(args.quiet)
 
@@ -46,7 +48,8 @@ def main():
             res = run_one(f"tsp/{name}/{args.selection}/run{run}", PermutationVectorCreator(num_cities),
                           evaluator, operators, selection,
                           population_size=args.population_size, generations=args.generations,
-                          elitism=cfg.elitism, output_path=out, quiet=args.quiet)
+                          elitism=cfg.elitism, output_path=out, quiet=args.quiet,
+                          diversity_fn=None if args.no_diversity else tsp_edge_diversity)
             print(f"  run {run}: best tour length = {-res['best_fitness']:.0f}")
 
 
