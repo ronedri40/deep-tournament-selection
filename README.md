@@ -9,7 +9,7 @@ reinforcement learning, and is implemented as a drop-in [EC-KitY](https://github
 `SelectionMethod`.
 
 <p align="center">
-  <img src="images/dts_arch.png" alt="Deep Tournament Selection architecture" width="780">
+  <img src="images/dts_arch.png" alt="Deep Tournament Selection architecture" width="640">
 </p>
 
 ## Abstract
