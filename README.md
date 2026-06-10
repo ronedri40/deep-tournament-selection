@@ -4,6 +4,9 @@ Reference implementation of the paper **"Deep Tournament Selection for Genetic A
 (Eliad Shem-Tov, Ron Edri, Achiya Elyasaf — Ben-Gurion University of the Negev).
 📄 **Paper:** _link coming soon_.
 
+Implemented as a thin EC-KitY adapter (`selection/eckity_adapter.py`), DTS drops into any GA in one
+line: `selection_methods=[(dts, 1)]`.
+
 <p align="center">
   <img src="images/dts_arch.png" alt="Deep Tournament Selection architecture" width="640">
 </p>
