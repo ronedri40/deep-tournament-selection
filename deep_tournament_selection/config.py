@@ -5,8 +5,9 @@ identical GA parameters across domains — population 100, elitism 2, crossover
 probability 0.5, mutation probability 0.5 with per-gene flip 0.1, 15 repeats; 6000 generations
 for Graph Coloring and Set Cover, 1000 for TSP. DTS uses tournament size k=5, a
 2-layer / 4-head Transformer encoder (feedforward 256, latent 32), Adam with
-lr 2e-3 linearly decayed to 1e-3, reward over the top-m=5 individuals, model
-updates every 10 generations, and teacher-forcing starting at epsilon 0.2.
+lr 2e-3 linearly decayed to 1e-3, reward over the top-m=5 individuals, and model
+updates every 10 generations. Teacher forcing starts fully guided (epsilon 1.0)
+and decays exponentially (x0.999/gen) down to a floor of 0.2.
 
 The runners expose CLI overrides so you can run a quick smoke test without editing
 this file.
@@ -26,9 +27,9 @@ class DTSConfig:
     learning_rate: float = 2e-3
     final_lr: float = 1e-3
     train_every_n_gens: int = 10
-    epsilon_greedy: float = 0.2      # teacher-forcing prob: start at 0.2 (paper)...
+    epsilon_greedy: float = 1.0      # teacher-forcing prob: start fully guided...
     epsilon_greedy_decay: float = 0.999
-    min_epsilon: float = 0.0         # ...decaying exponentially to 0 = fully learned selection
+    min_epsilon: float = 0.2         # ...decaying exponentially down to a floor of 0.2
 
 
 POPULATION_SIZE = 100
