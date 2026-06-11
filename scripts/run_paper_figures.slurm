@@ -43,6 +43,11 @@ assert torch.cuda.is_available(), "CUDA is not available on this node — check 
 print("CUDA OK:", torch.cuda.get_device_name(0), "| torch", torch.__version__)
 PY
 
+# ----- fresh run: clear cached runs so config changes actually take effect -----
+# (make_paper_figures skips runs whose JSON already exists; wipe them for a clean re-run)
+echo "Clearing previous cached runs so the current config is used ..."
+rm -rf runs/paper_figures figures/reproduction_fitness_all_domains.png figures/reproduction_fitness_all_domains.pdf
+
 # ----- run: DTS vs Tournament on the paper's representative instances, on GPU -----
 python make_paper_figures.py --mode "$MODE" --runs "$RUNS" --device cuda \
     --output runs/paper_figures --figdir figures
