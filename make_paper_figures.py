@@ -118,8 +118,14 @@ def load_mean_curve(domain, fname, sel, output):
         curves.append(arr)
     if not curves:
         return None
-    L = min(len(c) for c in curves)               # align on shortest run
-    return np.mean([c[:L] for c in curves], axis=0)
+    # Pad ragged runs (e.g. one interrupted run) with NaN to the longest length,
+    # then average ignoring NaNs — so a partial run contributes where it has data
+    # instead of truncating the whole curve to its length.
+    L = max(len(c) for c in curves)
+    padded = np.full((len(curves), L), np.nan)
+    for i, c in enumerate(curves):
+        padded[i, :len(c)] = c
+    return np.nanmean(padded, axis=0)
 
 
 def plot(args):
