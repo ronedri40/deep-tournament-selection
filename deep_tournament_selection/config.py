@@ -2,7 +2,7 @@
 
 From "Deep Tournament Selection for Genetic Algorithms" (Shem-Tov, Edri, Elyasaf):
 identical GA parameters across domains — population 100, elitism 2, crossover
-probability 0.8, mutation probability 0.5 with per-gene flip 0.1, 15 repeats; 6000 generations
+probability 0.5, mutation probability 0.5 with per-gene flip 0.1, 15 repeats; 6000 generations
 for Graph Coloring and Set Cover, 1000 for TSP. DTS uses tournament size k=5, a
 2-layer / 4-head Transformer encoder (feedforward 256, latent 32), Adam with
 lr 2e-3 linearly decayed to 1e-3, reward over the top-m=5 individuals, model
@@ -33,7 +33,7 @@ class DTSConfig:
 
 POPULATION_SIZE = 100
 ELITISM = 2
-CROSSOVER_PROB = 0.8
+CROSSOVER_PROB = 0.5
 MUTATION_PROB = 0.5
 FLIP_MUTATION_PROB = 0.1
 RUNS = 15
