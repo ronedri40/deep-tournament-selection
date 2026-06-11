@@ -87,6 +87,7 @@ def run_all(args):
         path = instance_path(domain, fname)
         generations = gens_for(domain, args)
         pop = args.population_size or cfg.population_size
+        cross = args.crossover_prob if args.crossover_prob is not None else cfg.crossover_prob
         for sel in SELECTIONS:
             for run in range(args.runs):
                 out = os.path.join(args.output, domain, fname, sel, f"run_{run}.json")
@@ -94,7 +95,7 @@ def run_all(args):
                     print(f"[skip cached] {domain}/{fname}/{sel}/run{run}")
                     continue
                 ev, creator, operators, vocab, _ = spec["build"](
-                    path, cfg, cfg.crossover_prob, cfg.mutation_prob)
+                    path, cfg, cross, cfg.mutation_prob)
                 selection = make_selection(sel, pop, vocab, dts_cfg=dts_cfg,
                                            device=args.device)
                 print(f"[run] {domain}/{fname}/{sel}/run{run}  "
@@ -177,6 +178,9 @@ def main():
     p.add_argument("--generations", type=int, default=None,
                    help="override generations for ALL domains (ignores --mode)")
     p.add_argument("--population-size", type=int, default=None)
+    p.add_argument("--crossover-prob", type=float, default=None,
+                   help="override the crossover probability for all domains "
+                        "(default: per-domain config value)")
     p.add_argument("--force", action="store_true", help="recompute even if a run JSON exists")
     p.add_argument("--plot-only", action="store_true", help="skip running, just plot cached runs")
     p.add_argument("--output", default=os.path.join("runs", "paper_figures"))
