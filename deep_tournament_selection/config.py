@@ -26,9 +26,9 @@ class DTSConfig:
     learning_rate: float = 2e-3
     final_lr: float = 1e-3
     train_every_n_gens: int = 10
-    epsilon_greedy: float = 0.2
+    epsilon_greedy: float = 0.2      # teacher-forcing prob: start at 0.2 (paper)...
     epsilon_greedy_decay: float = 0.999
-    min_epsilon: float = 0.2
+    min_epsilon: float = 0.0         # ...decaying exponentially to 0 = fully learned selection
 
 
 POPULATION_SIZE = 100
