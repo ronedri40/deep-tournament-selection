@@ -27,3 +27,10 @@ include = ["deep_tournament_selection*"]
 
 [tool.setuptools.package-data]
 deep_tournament_selection = ["problems/data/**/*"]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]   # pycodestyle errors/warnings + pyflakes
+ignore = ["E501"]          # line length is governed by `ruff format`

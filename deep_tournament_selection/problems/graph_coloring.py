@@ -10,16 +10,16 @@ def parse_graph_file(file_path):
     with open(file_path, "r") as f:
         raw_lines = f.readlines()
 
-    p_lines = [l for l in raw_lines if l.startswith("p")]
+    p_lines = [line for line in raw_lines if line.startswith("p")]
     assert len(p_lines) == 1
     n_nodes, n_edges = p_lines[0].split()[2:4]
     n_nodes, n_edges = int(n_nodes), int(n_edges)
 
     edges_information = {i + 1: [] for i in range(n_nodes)}
-    for l in raw_lines:
-        if not l.startswith("e"):
+    for line in raw_lines:
+        if not line.startswith("e"):
             continue
-        v1, v2 = (int(x) for x in l.split()[1:3])
+        v1, v2 = (int(x) for x in line.split()[1:3])
         edges_information[v1].append(v2)
         edges_information[v2].append(v1)
     return edges_information, n_nodes, n_edges

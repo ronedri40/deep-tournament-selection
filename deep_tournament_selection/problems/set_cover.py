@@ -22,7 +22,7 @@ def load_data(input_path):
 
 
 def _parse_single_case(block):
-    lines = [l.strip() for l in block.splitlines() if l.strip()]
+    lines = [line.strip() for line in block.splitlines() if line.strip()]
     if not lines:
         raise ValueError("Empty test case block.")
     header = lines[0].split()
