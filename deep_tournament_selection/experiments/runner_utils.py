@@ -18,12 +18,19 @@ from ..elitist_breeder import ElitistBreeder
 from ..logging_utils import FileLogger
 
 
-def make_selection(kind, population_size, vocab_size, dts_cfg=None, device="cpu"):
+def make_selection(
+    kind,
+    population_size,
+    vocab_size,
+    dts_cfg=None,
+    device="cpu",
+    custom_reward_function=None,
+):
     """Return a selection operator: 'dts' (learned) or 'tournament' (baseline)."""
     if kind == "dts":
-        kwargs = {}
+        kwargs = {"custom_reward_function": custom_reward_function}
         if dts_cfg is not None:
-            kwargs = dict(
+            kwargs.update(
                 latent_dim=dts_cfg.latent_dim,
                 dim_feedforward=dts_cfg.dim_feedforward,
                 n_layers=dts_cfg.n_layers,

@@ -28,6 +28,7 @@ def build_dts_operator(
     epsilon_greedy=1.0,
     epsilon_greedy_decay=0.999,
     min_epsilon=0.2,
+    custom_reward_function=None,
     higher_is_better=True,
 ):
     """Build the DTS operator as an EC-KitY ``SelectionMethod``.
@@ -77,6 +78,7 @@ def build_dts_operator(
         epsilon_greedy=epsilon_greedy,
         epsilon_greedy_decay=epsilon_greedy_decay,
         min_epsilon=min_epsilon,
+        custom_reward_function=custom_reward_function,
     )
 
     return DeepTournamentSelection(policy, higher_is_better=higher_is_better)
