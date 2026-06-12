@@ -1,12 +1,3 @@
-"""Graph Coloring experiment runner — DTS (or tournament baseline) inside EC-KitY.
-
-Examples
---------
-    python -m deep_tournament_selection.experiments.graph_coloring
-    python -m deep_tournament_selection.experiments.graph_coloring --instance queen8_12.col.txt --generations 100
-    python -m deep_tournament_selection.experiments.graph_coloring --selection tournament --instance all
-"""
-
 import argparse
 import os
 
