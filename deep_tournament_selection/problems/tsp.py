@@ -1,10 +1,3 @@
-"""Traveling Salesman Problem (TSP) — EC-KitY evaluator + TSPLIB loader.
-
-Ported from the original repo (problems/tsp/). Individuals are permutations of
-0..num_cities-1; fitness is the NEGATED tour length (so higher is better, which
-is what DTS expects).
-"""
-
 from math import sqrt, ceil
 
 import numpy as np

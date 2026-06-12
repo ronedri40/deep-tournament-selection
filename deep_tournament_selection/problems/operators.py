@@ -1,15 +1,3 @@
-"""Custom EC-KitY genetic operators used by the paper's problems.
-
-EC-KitY ships k-point crossover and per-gene int/bit mutation, but it has no
-uniform crossover and no permutation (TSP) operators. These are ported faithfully
-from the original repo (ga_auxiliary.py):
-
-* VectorUniformCrossover   -- uniform crossover (Set Cover, Graph Coloring)
-* PermutationVectorCreator -- initializes each individual as a random permutation (TSP)
-* SCXCrossover             -- Sequential Constructive Crossover, permutation-preserving (TSP)
-* RSMMutation              -- Reverse Sequence Mutation, permutation-preserving (TSP)
-"""
-
 import random
 
 import numpy as np

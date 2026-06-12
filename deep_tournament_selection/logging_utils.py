@@ -1,11 +1,3 @@
-"""Per-generation statistics logger.
-
-Records per-generation fitness statistics (mean / std / median / max / min) and
-wall-clock time, and writes them as JSON to the run's output path — periodically
-during the run and once more at the end. Column names match the original
-deep_roulette_selection repo's `generation_metrics` / results.json.
-"""
-
 import json
 import os
 import time

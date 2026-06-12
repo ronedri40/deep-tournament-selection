@@ -1,10 +1,3 @@
-"""Set Cover Problem (SCP) — EC-KitY evaluator + Beasley/SCP loader.
-
-Ported from the original repo (problems/set_cover/). Individuals are bit vectors
-of length n_columns (1 = column selected). Fitness is NEGATED
-(total cost + penalty * #uncovered-rows), so higher is better, matching DTS.
-"""
-
 import re
 
 import numpy as np

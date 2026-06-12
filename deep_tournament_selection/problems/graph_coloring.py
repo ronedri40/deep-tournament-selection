@@ -1,11 +1,3 @@
-"""Graph Coloring — EC-KitY evaluator + DIMACS (.col) loader.
-
-Ported from the original repo (problems/graph_coloring/). Individuals are integer
-vectors of length n_nodes, each gene a color in [0, max_colors]. Fitness is
-NEGATED (#distinct colors + penalty * #nodes-with-a-same-colored-neighbor), so
-higher is better, matching DTS.
-"""
-
 import numpy as np
 from eckity.evaluators.simple_individual_evaluator import SimpleIndividualEvaluator
 

@@ -1,17 +1,3 @@
-"""Per-problem hyperparameters matching the paper's experimental setting.
-
-From "Deep Tournament Selection for Genetic Algorithms" (Shem-Tov, Edri, Elyasaf):
-identical GA parameters across domains — population 100, elitism 2, crossover
-probability 0.5, mutation probability 0.5 with per-gene flip 0.1, 15 repeats; 6000 generations
-for Graph Coloring and Set Cover, 1000 for TSP. DTS uses tournament size k=5, a
-2-layer / 4-head Transformer encoder (feedforward 256, latent 32), Adam with
-lr 2e-3 linearly decayed to 1e-3, reward over the top-m=5 individuals, and model
-updates every 10 generations.
-
-The runners expose CLI overrides so you can run a quick smoke test without editing
-this file.
-"""
-
 from dataclasses import dataclass, field
 from typing import List
 

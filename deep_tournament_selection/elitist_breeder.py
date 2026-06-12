@@ -1,16 +1,3 @@
-"""Strong-elitism breeder.
-
-EC-KitY's default ``SimpleBreeder`` inserts the elites into the next generation
-and then applies the crossover/mutation operators to the WHOLE next generation —
-including the elites — so the best individual can degrade from one generation to
-the next.
-
-The original GA this project is based on used *strong* elitism: the best
-``n_elite`` individuals are carried over **unchanged** (never crossed or mutated).
-``ElitistBreeder`` restores that behaviour: operators are applied only to the
-non-elite offspring, and the elites are appended untouched.
-"""
-
 from eckity.breeders.simple_breeder import SimpleBreeder
 from eckity.genetic_operators.selections.elitism_selection import ElitismSelection
 

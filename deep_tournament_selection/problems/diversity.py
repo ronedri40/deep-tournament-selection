@@ -1,16 +1,3 @@
-"""Per-domain population-diversity metrics (ported from the original repo).
-
-Each domain measures diversity differently:
-* Set Cover      -> average pairwise Jaccard distance over the selected columns.
-* Graph Coloring -> average pairwise Hamming distance after canonicalizing the
-                    colorings (relabel colors by first appearance, so colorings
-                    that are equal up to a color permutation count as identical).
-* TSP            -> average pairwise edge distance (1 - fraction of shared undirected
-                    edges), since permutations need an order-aware metric.
-
-All return a value in [0, 1]; higher = more diverse.
-"""
-
 import numpy as np
 
 
