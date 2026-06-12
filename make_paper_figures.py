@@ -33,6 +33,7 @@ Examples
 import argparse
 import json
 import os
+from dataclasses import replace
 
 import numpy as np
 
@@ -86,15 +87,27 @@ def selected_panels(args):
 
 def run_all(args):
     """Run (or reuse cached) the runs needed for every panel; return nothing."""
+    # Optional ablation overrides. epsilon is shared (DTSConfig); the rest are
+    # per-domain (applied via dataclasses.replace so the frozen config is intact).
     dts_cfg = DTSConfig()
+    if args.epsilon is not None:
+        dts_cfg = replace(dts_cfg, epsilon_greedy=args.epsilon, min_epsilon=args.epsilon)
     for domain, _title in selected_panels(args):
         spec = PROBLEMS[domain]
         cfg = spec["cfg"]
+        overrides = {}
+        if args.crossover_prob is not None:
+            overrides["crossover_prob"] = args.crossover_prob
+        if args.elitism is not None:
+            overrides["elitism"] = args.elitism
+        if args.flip_mutation_prob is not None and hasattr(cfg, "flip_mutation_prob"):
+            overrides["flip_mutation_prob"] = args.flip_mutation_prob
+        if overrides:
+            cfg = replace(cfg, **overrides)
         fname = REPRESENTATIVE[domain]
         path = instance_path(domain, fname)
         generations = gens_for(domain, args)
         pop = args.population_size or cfg.population_size
-        cross = args.crossover_prob if args.crossover_prob is not None else cfg.crossover_prob
         for sel in SELECTIONS:
             for run in range(args.runs):
                 out = os.path.join(args.output, domain, fname, sel, f"run_{run}.json")
@@ -102,7 +115,7 @@ def run_all(args):
                     print(f"[skip cached] {domain}/{fname}/{sel}/run{run}")
                     continue
                 ev, creator, operators, vocab, _ = spec["build"](
-                    path, cfg, cross, cfg.mutation_prob)
+                    path, cfg, cfg.crossover_prob, cfg.mutation_prob)
                 reward_fn = custom_reward if args.custom_reward else None
                 selection = make_selection(sel, pop, vocab, dts_cfg=dts_cfg,
                                            device=args.device,
@@ -195,8 +208,13 @@ def main():
                    help="which experiment(s) to run/plot (default: all three). "
                         "e.g. --domains graph_coloring")
     p.add_argument("--crossover-prob", type=float, default=None,
-                   help="override the crossover probability for all domains "
-                        "(default: per-domain config value)")
+                   help="override crossover probability (default: per-domain config)")
+    p.add_argument("--flip-mutation-prob", type=float, default=None,
+                   help="override per-gene flip mutation probability (GC/SC only)")
+    p.add_argument("--elitism", type=int, default=None,
+                   help="override the number of elites")
+    p.add_argument("--epsilon", type=float, default=None,
+                   help="override DTS teacher-forcing epsilon (constant; sets start == floor)")
     p.add_argument("--custom-reward", action="store_true",
                    help="use the paper's custom DTS reward (Eliad's Graph Coloring config)")
     p.add_argument("--force", action="store_true", help="recompute even if a run JSON exists")
