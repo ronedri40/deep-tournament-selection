@@ -15,6 +15,7 @@ EC-KitY (Individual world)::
 
     select(source_inds: list[Individual], dest_inds: list[Individual]) -> dest_inds
 """
+
 import numpy as np
 from overrides import override
 
@@ -50,7 +51,9 @@ class DeepTournamentSelection(SelectionMethod):
         n_to_select = len(source_inds) - len(dest_inds)
 
         population = np.array([ind.vector for ind in source_inds])
-        fitness_dict = {tuple(ind.vector): ind.get_pure_fitness() for ind in source_inds}
+        fitness_dict = {
+            tuple(ind.vector): ind.get_pure_fitness() for ind in source_inds
+        }
         lookup = {tuple(ind.vector): ind for ind in source_inds}
 
         selected_vectors = self.policy.select(

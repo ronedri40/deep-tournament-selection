@@ -10,6 +10,7 @@ Each domain measures diversity differently:
 
 All return a value in [0, 1]; higher = more diverse.
 """
+
 import numpy as np
 
 
@@ -32,8 +33,10 @@ def set_cover_diversity(population: np.ndarray) -> float:
     counts = pop.sum(axis=1, dtype=np.int32)
     unions = counts[:, None] + counts[None, :] - intersections
     similarities = np.divide(
-        intersections, unions,
-        out=np.ones_like(intersections, dtype=np.float64), where=unions > 0,
+        intersections,
+        unions,
+        out=np.ones_like(intersections, dtype=np.float64),
+        where=unions > 0,
     )
     distances = 1.0 - similarities
     triu = np.triu_indices(n, k=1)

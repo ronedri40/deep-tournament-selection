@@ -5,6 +5,7 @@ wall-clock time, and writes them as JSON to the run's output path — periodical
 during the run and once more at the end. Column names match the original
 deep_roulette_selection repo's `generation_metrics` / results.json.
 """
+
 import json
 import os
 import time
@@ -16,8 +17,13 @@ from eckity.statistics.statistics import Statistics
 class FileLogger(Statistics):
     BASE_KEYS = ("mean", "std", "median", "max", "min", "time")
 
-    def __init__(self, output_path=None, save_every_n_generations=50,
-                 diversity_fn=None, format_string=None):
+    def __init__(
+        self,
+        output_path=None,
+        save_every_n_generations=50,
+        diversity_fn=None,
+        format_string=None,
+    ):
         super().__init__(format_string or "")
         self.output_path = output_path
         self.save_every_n_generations = save_every_n_generations

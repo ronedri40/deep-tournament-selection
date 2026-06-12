@@ -14,7 +14,7 @@ class RecombinationAttention(nn.Module):
         self.W_Q = nn.Linear(embed_dim, key_dim, bias=False)
         self.W_K = nn.Linear(embed_dim, key_dim, bias=False)
         self.W_V = nn.Linear(embed_dim, 1, bias=False)
-        self.scale = key_dim ** 0.5
+        self.scale = key_dim**0.5
 
     def forward(self, Ft):
         """

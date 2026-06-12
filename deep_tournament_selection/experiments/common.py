@@ -5,6 +5,7 @@
 EC-KitY ``DeepTournamentSelection`` adapter, ready to drop into a
 ``Subpopulation``'s ``selection_methods``.
 """
+
 from ..selection.dts_policy import DTSPolicy
 from ..selection.eckity_adapter import DeepTournamentSelection
 from ..selection.population_to_vec_transformer import PopulationToVecTransformer
@@ -60,7 +61,10 @@ def build_dts_operator(
 
     def teacher_forcing(pop, n_select, fit_dict):
         from ..selection.tournament_utils import tournament_selection
-        return tournament_selection(pop, n_select, tournament_size, fit_dict, return_index=True)
+
+        return tournament_selection(
+            pop, n_select, tournament_size, fit_dict, return_index=True
+        )
 
     policy = DTSPolicy(
         pop_to_vec_transformer=encoder,

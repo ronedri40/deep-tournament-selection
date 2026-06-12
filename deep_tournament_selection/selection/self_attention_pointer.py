@@ -12,24 +12,42 @@ class SelfAttentionPointer(nn.Module):
     No autoregressive decoding.
     """
 
-    def __init__(self, pointer_len, d_model, log_stability=1e-12, max_selection_sequence_length=32,
-                 sampling_method='categorical', teacher_forcing_strategy='hard', use_rank_embeddings=True):
+    def __init__(
+        self,
+        pointer_len,
+        d_model,
+        log_stability=1e-12,
+        max_selection_sequence_length=32,
+        sampling_method="categorical",
+        teacher_forcing_strategy="hard",
+        use_rank_embeddings=True,
+    ):
 
         super().__init__()
-        assert teacher_forcing_strategy in ['hard', 'soft']
-        assert sampling_method in ['categorical', 'greedy'], "Unsupported sampling method"
+        assert teacher_forcing_strategy in ["hard", "soft"]
+        assert sampling_method in ["categorical", "greedy"], (
+            "Unsupported sampling method"
+        )
         self.pointer_len = pointer_len
         self.d_model = d_model
         self.log_stability = log_stability
         self.sampling_method = sampling_method
         self.teacher_forcing_strategy = teacher_forcing_strategy
 
-        self.recomb_attn = RecombinationAttention(embed_dim=d_model,
-                                                  key_dim=d_model // 4)
+        self.recomb_attn = RecombinationAttention(
+            embed_dim=d_model, key_dim=d_model // 4
+        )
         self.pos_emb = nn.Embedding(max_selection_sequence_length, d_model)
         self.use_rank_embeddings = use_rank_embeddings
 
-    def forward(self, sent_embeds, pointer_len=None, teacher_forcing=None, population_order=None, epsilon_greedy=0.0):
+    def forward(
+        self,
+        sent_embeds,
+        pointer_len=None,
+        teacher_forcing=None,
+        population_order=None,
+        epsilon_greedy=0.0,
+    ):
         """
         sent_embeds: [B, N, d_model]
         teacher_forcing:[B, pointer_len] or None
@@ -53,11 +71,9 @@ class SelfAttentionPointer(nn.Module):
         log_probs = torch.log(w_t + self.log_stability)
 
         for t in range(pointer_len):
-
-
             logits.append(log_probs)
 
-            if self.teacher_forcing_strategy == 'hard':
+            if self.teacher_forcing_strategy == "hard":
                 idx = self.hard_epsilon_greedy(teacher_forcing, w_t, t, epsilon_greedy)
             else:
                 idx = self.soft_epsilon_greedy(teacher_forcing, w_t, t, epsilon_greedy)
@@ -77,7 +93,7 @@ class SelfAttentionPointer(nn.Module):
         return self.sample_from_attention_dist(w_t)
 
     def sample_from_attention_dist(self, w_t):
-        if self.sampling_method == 'categorical':
+        if self.sampling_method == "categorical":
             idx = torch.distributions.Categorical(probs=w_t).sample()
         else:
             _, idx = torch.max(w_t, dim=1)

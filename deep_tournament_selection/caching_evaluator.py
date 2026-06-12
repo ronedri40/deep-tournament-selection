@@ -1,27 +1,4 @@
-"""Persistent fitness cache for EC-KitY — a faithful port of the tuple-keyed
-fitness cache used in the original custom GA (``ga_deapless.py``'s ``fitness_dict``).
-
-EC-KitY's ``SimplePopulationEvaluator`` re-evaluates every individual every
-generation with no caching. Wrapping the problem evaluator in ``CachingEvaluator``
-restores the original behaviour: an individual whose genotype was already scored
-(an elite, or an unchanged clone produced by selection) is served from cache
-instead of being recomputed — which matters when the fitness function is expensive.
-
-Usage:
-    evaluator = CachingEvaluator(MyEvaluator())
-    Subpopulation(..., evaluator=evaluator, ...)
-
-Notes
------
-* Caches by ``tuple(individual.vector)`` — the same key the original GA used.
-* Works with single-process evaluation (``max_workers=1``). Like the original
-  cache, it is not shared across processes, so a process-pool evaluation would
-  not see each other's cache entries.
-* ``max_size`` optionally bounds the cache (oldest entries evicted), mirroring
-  the original ``clear_fitness_dict_after_sampling`` memory-bounding intent.
-"""
 from collections import OrderedDict
-
 from eckity.evaluators.simple_individual_evaluator import SimpleIndividualEvaluator
 
 

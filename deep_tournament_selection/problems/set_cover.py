@@ -4,6 +4,7 @@ Ported from the original repo (problems/set_cover/). Individuals are bit vectors
 of length n_columns (1 = column selected). Fitness is NEGATED
 (total cost + penalty * #uncovered-rows), so higher is better, matching DTS.
 """
+
 import re
 
 import numpy as np
@@ -40,7 +41,7 @@ def _parse_single_case(block):
         for j in range(n):
             tokens = remaining[j].split()
             cost, count = int(tokens[0]), int(tokens[1])
-            col_rows.append(list(map(int, tokens[2:2 + count])))
+            col_rows.append(list(map(int, tokens[2 : 2 + count])))
             costs.append(cost)
         row_cover = [[] for _ in range(m)]
         for j in range(n):
@@ -49,8 +50,12 @@ def _parse_single_case(block):
         return {"m": m, "n": n, "costs": costs, "row_cover": row_cover}
 
     elif len(remaining) == m:
-        return {"m": m, "n": n, "costs": [1] * n,
-                "row_cover": [list(map(int, remaining[i].split())) for i in range(m)]}
+        return {
+            "m": m,
+            "n": n,
+            "costs": [1] * n,
+            "row_cover": [list(map(int, remaining[i].split())) for i in range(m)],
+        }
 
     else:
         cost_tokens, idx = [], 0
@@ -63,16 +68,19 @@ def _parse_single_case(block):
             row_tokens.extend(line.split())
         t, row_cover = 0, []
         for _ in range(m):
-            k = int(row_tokens[t]); t += 1
-            row_cover.append(list(map(int, row_tokens[t:t + k]))); t += k
+            k = int(row_tokens[t])
+            t += 1
+            row_cover.append(list(map(int, row_tokens[t : t + k])))
+            t += k
         return {"m": m, "n": n, "costs": costs, "row_cover": row_cover}
 
 
 class SetCoverEvaluator(SimpleIndividualEvaluator):
     """Fitness = -(total cost + penalty * #uncovered rows). Maximize."""
 
-    def __init__(self, path_to_instance, penalty=100.0, weighted=False,
-                 case_index=0, events=None):
+    def __init__(
+        self, path_to_instance, penalty=100.0, weighted=False, case_index=0, events=None
+    ):
         super().__init__(events=events)
         case = load_data(path_to_instance)[case_index]
         self.n_columns = case["n"]
@@ -85,6 +93,8 @@ class SetCoverEvaluator(SimpleIndividualEvaluator):
     def evaluate_individual(self, individual):
         vec = np.asarray(individual.vector)
         selected = set(np.flatnonzero(vec == 1).tolist())
-        total_cost = float(self.costs[vec == 1].sum()) if self.weighted else float(vec.sum())
+        total_cost = (
+            float(self.costs[vec == 1].sum()) if self.weighted else float(vec.sum())
+        )
         uncovered = sum(1 for cover in self.row_cover if not (cover & selected))
         return float(-(total_cost + self.penalty * uncovered))

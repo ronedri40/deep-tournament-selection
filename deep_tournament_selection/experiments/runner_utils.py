@@ -3,6 +3,7 @@
 These keep the individual runners (tsp.py, graph_coloring.py, set_cover.py) small
 and consistent.
 """
+
 import logging
 import os
 
@@ -36,7 +37,10 @@ def make_selection(kind, population_size, vocab_size, dts_cfg=None, device="cpu"
                 min_epsilon=dts_cfg.min_epsilon,
             )
         return build_dts_operator(
-            population_size=population_size, vocab_size=vocab_size, device=device, **kwargs
+            population_size=population_size,
+            vocab_size=vocab_size,
+            device=device,
+            **kwargs,
         )
     elif kind == "tournament":
         t = dts_cfg.tournament_size if dts_cfg is not None else 5
@@ -44,9 +48,22 @@ def make_selection(kind, population_size, vocab_size, dts_cfg=None, device="cpu"
     raise ValueError(f"unknown selection kind: {kind}")
 
 
-def run_one(label, creator, evaluator, operators, selection, *,
-            population_size, generations, elitism, output_path=None,
-            diversity_fn=None, use_cache=True, quiet=False, max_workers=1):
+def run_one(
+    label,
+    creator,
+    evaluator,
+    operators,
+    selection,
+    *,
+    population_size,
+    generations,
+    elitism,
+    output_path=None,
+    diversity_fn=None,
+    use_cache=True,
+    quiet=False,
+    max_workers=1,
+):
     """Run a single evolution and return a result dict.
 
     All problems here are framed as MAXIMIZATION (fitness is negated cost), so
@@ -94,6 +111,7 @@ def resolve_instances(data_subdir, instance_arg, default_list):
     string 'all', or None (-> use default_list).
     """
     from ..problems import DATA_DIR
+
     base = os.path.join(DATA_DIR, data_subdir)
 
     def to_path(name):

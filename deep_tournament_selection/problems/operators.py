@@ -9,6 +9,7 @@ from the original repo (ga_auxiliary.py):
 * SCXCrossover             -- Sequential Constructive Crossover, permutation-preserving (TSP)
 * RSMMutation              -- Reverse Sequence Mutation, permutation-preserving (TSP)
 """
+
 import random
 
 import numpy as np
@@ -134,6 +135,6 @@ class RSMMutation(GeneticOperator):
             vec = ind.vector
             n = len(vec)
             i, j = sorted(random.sample(range(n), 2))
-            vec[i:j + 1] = vec[i:j + 1][::-1]
+            vec[i : j + 1] = vec[i : j + 1][::-1]
         self.applied_individuals = individuals
         return individuals

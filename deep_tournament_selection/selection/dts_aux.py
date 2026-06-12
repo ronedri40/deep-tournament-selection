@@ -40,19 +40,23 @@ def get_average_pairwise_hamming_distance(population: np.ndarray) -> float:
     return float(pairwise_dist[triu_indices].mean() / population.shape[1])
 
 
-def get_reward_from_fitness_scores(cur_gen_fitness_values: np.ndarray,
-                                   prev_gen_fitness_values: np.ndarray,
-                                   population: np.ndarray | None = None,
-                                   top_k_to_consider: int = 5,
-                                   best_weight: float = 0.25,
-                                   top_k_weight: float = 1.0,
-                                    mean_weight: float = 0.25,
-                                   diversity_weight: float = 0.05,
-                                   eps: float = 1e-8):
+def get_reward_from_fitness_scores(
+    cur_gen_fitness_values: np.ndarray,
+    prev_gen_fitness_values: np.ndarray,
+    population: np.ndarray | None = None,
+    top_k_to_consider: int = 5,
+    best_weight: float = 0.25,
+    top_k_weight: float = 1.0,
+    mean_weight: float = 0.25,
+    diversity_weight: float = 0.05,
+    eps: float = 1e-8,
+):
     cur_gen_fitness_values = np.asarray(cur_gen_fitness_values, dtype=np.float64)
     prev_gen_fitness_values = np.asarray(prev_gen_fitness_values, dtype=np.float64)
 
-    k = min(top_k_to_consider, len(cur_gen_fitness_values), len(prev_gen_fitness_values))
+    k = min(
+        top_k_to_consider, len(cur_gen_fitness_values), len(prev_gen_fitness_values)
+    )
 
     def normalized_delta(cur_value: float, prev_value: float) -> float:
         scale = max(abs(prev_value), eps)
@@ -72,10 +76,10 @@ def get_reward_from_fitness_scores(cur_gen_fitness_values: np.ndarray,
         diversity_reward = get_average_pairwise_hamming_distance(population)
 
     reward = (
-        top_k_weight * normalized_delta(cur_top_k_mean, prev_top_k_mean) +
-        best_weight * normalized_delta(cur_best, prev_best) +
-        mean_weight * normalized_delta(cur_mean, prev_mean) +
-        diversity_weight * diversity_reward
+        top_k_weight * normalized_delta(cur_top_k_mean, prev_top_k_mean)
+        + best_weight * normalized_delta(cur_best, prev_best)
+        + mean_weight * normalized_delta(cur_mean, prev_mean)
+        + diversity_weight * diversity_reward
     )
     return float(reward)
 
@@ -84,5 +88,9 @@ def get_trajectory_probability_from_log_probs(log_probs, selected_population_ind
     """
     calculate total probability for the trajectory by summing the log probabilities over the selected indices
     """
-    trajectory_prob = torch.gather(log_probs, 2, selected_population_indices.unsqueeze(-1)).squeeze(-1).sum(dim=-1)
+    trajectory_prob = (
+        torch.gather(log_probs, 2, selected_population_indices.unsqueeze(-1))
+        .squeeze(-1)
+        .sum(dim=-1)
+    )
     return trajectory_prob

@@ -3,13 +3,20 @@ from torch import nn
 
 
 class PopulationToVecTransformer(nn.Module):
-    def __init__(self, vocab_size, emb_dim, latent_dim,
-                 n_heads=4, n_layers=2, dim_feedforward=256, max_pointers=128,
-                 max_gene_positions=4096,
-                 dropout=0.1,
-                 use_rank_embeddings=True,
-                 canonicalize=False
-                 ):
+    def __init__(
+        self,
+        vocab_size,
+        emb_dim,
+        latent_dim,
+        n_heads=4,
+        n_layers=2,
+        dim_feedforward=256,
+        max_pointers=128,
+        max_gene_positions=4096,
+        dropout=0.1,
+        use_rank_embeddings=True,
+        canonicalize=False,
+    ):
         super().__init__()
         self.token_emb = nn.Embedding(vocab_size, emb_dim)
         self.max_gene_positions = max_gene_positions
@@ -19,7 +26,7 @@ class PopulationToVecTransformer(nn.Module):
             nhead=n_heads,
             batch_first=True,
             dim_feedforward=dim_feedforward,
-            dropout=dropout
+            dropout=dropout,
         )
         self.encoder = nn.TransformerEncoder(encoder_layer, num_layers=n_layers)
         self.proj = nn.Linear(emb_dim, latent_dim)
@@ -48,7 +55,9 @@ class PopulationToVecTransformer(nn.Module):
             raise ValueError(
                 f"Sequence length {seq_len} exceeds max_gene_positions={self.max_gene_positions}"
             )
-        tok = tok + self.get_sinusoidal_positions(seq_len, x.device, tok.dtype).unsqueeze(0)
+        tok = tok + self.get_sinusoidal_positions(
+            seq_len, x.device, tok.dtype
+        ).unsqueeze(0)
 
         h = tok
 
@@ -75,7 +84,11 @@ class PopulationToVecTransformer(nn.Module):
     def canonicalize_single_sequence(self, seq):
         forward = self.get_canonical_rotation(seq)
         backward = self.get_canonical_rotation(torch.flip(seq, dims=(0,)))
-        return forward if self.is_lexicographically_smaller(forward, backward) else backward
+        return (
+            forward
+            if self.is_lexicographically_smaller(forward, backward)
+            else backward
+        )
 
     def get_canonical_rotation(self, seq):
         min_value = torch.min(seq)
@@ -84,7 +97,9 @@ class PopulationToVecTransformer(nn.Module):
 
         for start in candidate_starts.tolist():
             rotated = torch.roll(seq, shifts=-start, dims=0)
-            if best_rotation is None or self.is_lexicographically_smaller(rotated, best_rotation):
+            if best_rotation is None or self.is_lexicographically_smaller(
+                rotated, best_rotation
+            ):
                 best_rotation = rotated
 
         return best_rotation
@@ -99,13 +114,22 @@ class PopulationToVecTransformer(nn.Module):
         return bool(left[first_diff_index] < right[first_diff_index])
 
     def get_sinusoidal_positions(self, seq_len, device, dtype):
-        positions = torch.arange(seq_len, device=device, dtype=torch.float32).unsqueeze(1)
+        positions = torch.arange(seq_len, device=device, dtype=torch.float32).unsqueeze(
+            1
+        )
         div_term = torch.exp(
             torch.arange(0, self.emb_dim, 2, device=device, dtype=torch.float32)
-            * (-torch.log(torch.tensor(10000.0, device=device, dtype=torch.float32)) / self.emb_dim)
+            * (
+                -torch.log(torch.tensor(10000.0, device=device, dtype=torch.float32))
+                / self.emb_dim
+            )
         )
 
-        pos_encoding = torch.zeros(seq_len, self.emb_dim, device=device, dtype=torch.float32)
+        pos_encoding = torch.zeros(
+            seq_len, self.emb_dim, device=device, dtype=torch.float32
+        )
         pos_encoding[:, 0::2] = torch.sin(positions * div_term)
-        pos_encoding[:, 1::2] = torch.cos(positions * div_term[:pos_encoding[:, 1::2].shape[1]])
+        pos_encoding[:, 1::2] = torch.cos(
+            positions * div_term[: pos_encoding[:, 1::2].shape[1]]
+        )
         return pos_encoding.to(dtype=dtype)

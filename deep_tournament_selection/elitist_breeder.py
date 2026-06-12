@@ -10,6 +10,7 @@ The original GA this project is based on used *strong* elitism: the best
 ``ElitistBreeder`` restores that behaviour: operators are applied only to the
 non-elite offspring, and the elites are appended untouched.
 """
+
 from eckity.breeders.simple_breeder import SimpleBreeder
 from eckity.genetic_operators.selections.elitism_selection import ElitismSelection
 

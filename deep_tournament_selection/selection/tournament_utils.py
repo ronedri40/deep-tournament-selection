@@ -5,6 +5,7 @@ depends on. Extracting them here keeps the DTS package free of the monolithic GA
 (numba, multiprocessing, the whole custom evolution loop), so it can run purely as
 an EC-KitY operator.
 """
+
 from copy import deepcopy
 
 import numpy as np
@@ -36,8 +37,9 @@ def choose_from_competition(competition, fitness_dict, return_index=False):
         return np.copy(competition[np.argmax(fitnesses)])
 
 
-def tournament_selection(individuals, how_many_to_select, tournament_size, fitness_dict,
-                         return_index=False):
+def tournament_selection(
+    individuals, how_many_to_select, tournament_size, fitness_dict, return_index=False
+):
     """Classic tournament selection (used by DTS as its teacher-forcing baseline).
 
     :param individuals: population (numpy array of gene-vectors)
@@ -48,8 +50,11 @@ def tournament_selection(individuals, how_many_to_select, tournament_size, fitne
                          instead of the selected individuals themselves.
     """
     tournament_indexes: np.ndarray = np.random.randint(
-        0, len(individuals), size=(how_many_to_select, tournament_size))
-    tournaments = [individuals[tournament_index] for tournament_index in tournament_indexes]
+        0, len(individuals), size=(how_many_to_select, tournament_size)
+    )
+    tournaments = [
+        individuals[tournament_index] for tournament_index in tournament_indexes
+    ]
     selected_individuals = [
         choose_from_competition(tournament, fitness_dict, return_index=return_index)
         for tournament in tournaments
@@ -57,7 +62,8 @@ def tournament_selection(individuals, how_many_to_select, tournament_size, fitne
 
     if return_index:
         selected_population_indexes = tournament_indexes[
-            np.arange(tournament_indexes.shape[0]), selected_individuals]
+            np.arange(tournament_indexes.shape[0]), selected_individuals
+        ]
         return selected_population_indexes, tournament_indexes
     else:
         return deepcopy(np.array(selected_individuals))
