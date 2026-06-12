@@ -20,8 +20,10 @@ deep_tournament_selection/
   caching_evaluator.py  # persistent fitness cache (ports the original GA's fitness_dict)
   problems/             # EC-KitY evaluators + loaders + custom operators + bundled instances
     tsp.py, graph_coloring.py, set_cover.py, operators.py, data/
-  experiments/          # per-problem runners + shared helpers
+  experiments/          # per-problem CLI runners + shared helpers
     tsp.py, graph_coloring.py, set_cover.py, common.py, runner_utils.py
+  runners/              # notebook-style step-by-step scripts (edit params, no CLI)
+    tsp.py, graph_coloring.py, set_cover.py, custom_runner.py
   config.py             # paper hyperparameters
   logging_utils.py      # per-generation JSON statistics
 run_experiments.py      # single entry point to sweep all problems x instances x runs
@@ -91,6 +93,26 @@ dts = build_dts_operator(population_size=100, vocab_size=2)  # vocab_size = max 
 # ... inside your Subpopulation:
 selection_methods=[(dts, 1)]
 ```
+
+`selection_methods` is a list of `(method, probability)` pairs — the probability is the share of
+the next generation that method produces (they sum to 1 across methods). With a single method,
+`(dts, 1)` simply means DTS performs **100%** of the selection.
+
+### Step-by-step runners
+
+`deep_tournament_selection/runners/` holds notebook-style scripts: set the parameters at the top,
+then run the file (or step through the blocks in an editor) — no CLI flags. They assemble the whole
+pipeline explicitly, so you can tweak any single component in place.
+
+```bash
+python -m deep_tournament_selection.runners.graph_coloring   # or set_cover / tsp
+```
+
+`runners/custom_runner.py` is a **bring-your-own-problem template**: plug in (A) an evaluator (your
+fitness function), (B) an encoding (creator + operators), and (C) `vocab_size`, and DTS runs on it —
+it ships wired to a dummy OneMax problem to show the shape. Optionally (D) set `REWARD_FN` to a
+custom reward `f(cur_gen_fitness, prev_gen_fitness, population) -> float` (e.g.
+`selection.custom_reward.custom_reward`) to change how DTS itself is trained.
 
 ## Fitness cache
 
