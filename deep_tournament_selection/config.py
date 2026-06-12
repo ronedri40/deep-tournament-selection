@@ -27,9 +27,9 @@ class DTSConfig:
     learning_rate: float = 2e-3
     final_lr: float = 1e-3
     train_every_n_gens: int = 10
-    epsilon_greedy: float = 1.0      # teacher-forcing prob: start fully guided...
+    epsilon_greedy: float = 0.2      # Eliad's graph_coloring_dns.py: constant 0.2
     epsilon_greedy_decay: float = 0.999
-    min_epsilon: float = 0.2         # ...decaying exponentially down to a floor of 0.2
+    min_epsilon: float = 0.2         # (start == floor -> teacher forcing stays at 0.2)
 
 
 POPULATION_SIZE = 100
@@ -63,12 +63,12 @@ class GraphColoringConfig:
     ])
     population_size: int = POPULATION_SIZE
     generations: int = 6000
-    crossover_prob: float = CROSSOVER_PROB
+    crossover_prob: float = 0.8  # Eliad's graph_coloring_dns.py (shared default 0.5)
     mutation_prob: float = MUTATION_PROB
-    flip_mutation_prob: float = FLIP_MUTATION_PROB
+    flip_mutation_prob: float = 0.005  # Eliad's graph_coloring_dns.py ("was 0.1")
     penalty: float = 100.0
     colors_margin: int = 10
-    elitism: int = ELITISM
+    elitism: int = 3  # Eliad's graph_coloring_dns.py (shared default 2)
     runs: int = RUNS
 
 
