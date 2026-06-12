@@ -129,7 +129,7 @@ print(evaluator.cache_stats())   # {'hits': ..., 'misses': ..., 'hit_rate': ...}
 ## Results figures
 
 The paper's fitness and population-diversity plots are in [`figures/`](figures/)
-(`fitness_graph_dts_all_domains.pdf`, per-domain plots, and `hamming_distance_all_domains.pdf`).
+(`fitness_graph_dns_all_domains.pdf` and `hamming_distance_all_domains.pdf`).
 
 ## Citation
 
