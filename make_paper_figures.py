@@ -77,10 +77,16 @@ def instance_path(domain, fname):
     return os.path.join(DATA_DIR, PROBLEMS[domain]["data"], fname)
 
 
+def selected_panels(args):
+    """Panels to run/plot, filtered by --domains (default: all three)."""
+    chosen = getattr(args, "domains", None) or [d for d, _ in PANELS]
+    return [(d, t) for (d, t) in PANELS if d in chosen]
+
+
 def run_all(args):
     """Run (or reuse cached) the runs needed for every panel; return nothing."""
     dts_cfg = DTSConfig()
-    for domain, _title in PANELS:
+    for domain, _title in selected_panels(args):
         spec = PROBLEMS[domain]
         cfg = spec["cfg"]
         fname = REPRESENTATIVE[domain]
@@ -135,8 +141,10 @@ def plot(args):
     import matplotlib.pyplot as plt
     import pandas as pd
 
-    fig, axes = plt.subplots(1, len(PANELS), figsize=(18, 5))
-    for ax, (domain, title) in zip(axes, PANELS):
+    panels = selected_panels(args)
+    fig, axes = plt.subplots(1, len(panels), figsize=(6 * len(panels), 5), squeeze=False)
+    axes = axes[0]
+    for ax, (domain, title) in zip(axes, panels):
         fname = REPRESENTATIVE[domain]
         has_data = False
         for sel in SELECTIONS:
@@ -162,8 +170,9 @@ def plot(args):
                  fontsize=15)
     fig.tight_layout(rect=[0, 0, 1, 0.96])
     os.makedirs(args.figdir, exist_ok=True)
-    png = os.path.join(args.figdir, "reproduction_fitness_all_domains.png")
-    pdf = os.path.join(args.figdir, "reproduction_fitness_all_domains.pdf")
+    tag = "all_domains" if len(panels) == len(PANELS) else "_".join(d for d, _ in panels)
+    png = os.path.join(args.figdir, f"reproduction_fitness_{tag}.png")
+    pdf = os.path.join(args.figdir, f"reproduction_fitness_{tag}.pdf")
     fig.savefig(png, dpi=130, bbox_inches="tight")
     fig.savefig(pdf, bbox_inches="tight")
     print(f"\nFigure saved to:\n  {png}\n  {pdf}")
@@ -178,6 +187,10 @@ def main():
     p.add_argument("--generations", type=int, default=None,
                    help="override generations for ALL domains (ignores --mode)")
     p.add_argument("--population-size", type=int, default=None)
+    p.add_argument("--domains", nargs="+", choices=[d for d, _ in PANELS],
+                   default=[d for d, _ in PANELS],
+                   help="which experiment(s) to run/plot (default: all three). "
+                        "e.g. --domains graph_coloring")
     p.add_argument("--crossover-prob", type=float, default=None,
                    help="override the crossover probability for all domains "
                         "(default: per-domain config value)")
