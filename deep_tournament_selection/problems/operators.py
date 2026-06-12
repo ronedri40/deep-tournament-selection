@@ -17,21 +17,25 @@ from eckity.genetic_operators.genetic_operator import GeneticOperator
 
 
 class VectorUniformCrossover(GeneticOperator):
-    """Uniform crossover: swap each gene between the two parents with prob 0.5.
+    """Uniform crossover, faithful to the original `generate_child_n_point`.
 
-    Mirrors the original `_uniform_crossover` but as a standard arity-2 EC-KitY
-    operator (operates on a pair, like VectorKPointsCrossover).
+    Produces two INDEPENDENT children: each child inherits every gene from
+    parent 1 with probability `parent_selection_prob` (otherwise from parent 2),
+    sampled independently per child. Unlike a complementary swap, an allele can be
+    lost or duplicated across the pair — matching the paper's GA (ga_auxiliary.py).
     """
 
-    def __init__(self, probability=1.0, arity=2, swap_probability=0.5, events=None):
+    def __init__(self, probability=1.0, arity=2, parent_selection_prob=0.5, events=None):
         super().__init__(probability=probability, arity=arity, events=events)
-        self.swap_probability = swap_probability
+        self.parent_selection_prob = parent_selection_prob
 
     def apply(self, individuals):
+        p1 = list(individuals[0].vector)
+        p2 = list(individuals[1].vector)
         v1, v2 = individuals[0].vector, individuals[1].vector
-        for i in range(len(v1)):
-            if random.random() < self.swap_probability:
-                v1[i], v2[i] = v2[i], v1[i]
+        for i in range(len(p1)):
+            v1[i] = p1[i] if random.random() < self.parent_selection_prob else p2[i]
+            v2[i] = p1[i] if random.random() < self.parent_selection_prob else p2[i]
         self.applied_individuals = individuals
         return individuals
 
