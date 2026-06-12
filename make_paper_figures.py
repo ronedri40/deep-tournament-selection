@@ -40,6 +40,7 @@ from run_experiments import PROBLEMS
 from deep_tournament_selection.config import DTSConfig
 from deep_tournament_selection.experiments.runner_utils import make_selection, run_one
 from deep_tournament_selection.problems import DATA_DIR
+from deep_tournament_selection.selection.custom_reward import custom_reward
 
 # Representative instance per domain (exactly the ones in the paper's figure).
 # NOTE: the paper's convergence text/diversity figure use scp65 for Set Cover
@@ -102,8 +103,10 @@ def run_all(args):
                     continue
                 ev, creator, operators, vocab, _ = spec["build"](
                     path, cfg, cross, cfg.mutation_prob)
+                reward_fn = custom_reward if args.custom_reward else None
                 selection = make_selection(sel, pop, vocab, dts_cfg=dts_cfg,
-                                           device=args.device)
+                                           device=args.device,
+                                           custom_reward_function=reward_fn)
                 print(f"[run] {domain}/{fname}/{sel}/run{run}  "
                       f"(gens={generations}, pop={pop})")
                 run_one(f"{domain}/{fname}/{sel}/run{run}", creator, ev, operators,
@@ -194,6 +197,8 @@ def main():
     p.add_argument("--crossover-prob", type=float, default=None,
                    help="override the crossover probability for all domains "
                         "(default: per-domain config value)")
+    p.add_argument("--custom-reward", action="store_true",
+                   help="use the paper's custom DTS reward (Eliad's Graph Coloring config)")
     p.add_argument("--force", action="store_true", help="recompute even if a run JSON exists")
     p.add_argument("--plot-only", action="store_true", help="skip running, just plot cached runs")
     p.add_argument("--output", default=os.path.join("runs", "paper_figures"))
