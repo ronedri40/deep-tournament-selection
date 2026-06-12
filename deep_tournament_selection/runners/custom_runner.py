@@ -9,9 +9,13 @@ same:
     (B) an encoding   — the creator + genetic operators for your genome
     (C) vocab_size    — max gene value + 1 (DTS embeds every gene)
 
-To keep it concrete this file wires those three to a dummy **OneMax** problem
-(maximize the number of 1s in a bit string). Replace the three blocks marked
-``REPLACE THIS`` with your own problem and run:
+and, optionally:
+
+    (D) a reward      — change how DTS itself is trained (default works as-is)
+
+To keep it concrete this file wires those to a dummy **OneMax** problem (maximize
+the number of 1s in a bit string). Touch only the blocks you care about — e.g.
+swap the evaluator for your own problem, or just set a custom reward — and run:
 ``python -m deep_tournament_selection.runners.custom_runner``.
 """
 
@@ -79,12 +83,28 @@ operators = [
 ]
 
 # =========================================================================== #
+# (D) OPTIONAL  —  change how DTS is TRAINED with a custom reward
+#
+# Leave REWARD_FN = None to use the default reward. To customize, point it at a
+# function f(cur_gen_fitness, prev_gen_fitness, population) -> float, e.g. the
+# paper's reward:
+#     from ..selection.custom_reward import custom_reward
+#     REWARD_FN = custom_reward
+# =========================================================================== #
+REWARD_FN = None
+
+# =========================================================================== #
 # NOTHING PROBLEM-SPECIFIC BELOW — DTS + GA assembly, identical for any problem
 # =========================================================================== #
 evaluator = CachingEvaluator(evaluator)  # cross-generation fitness cache
 
 selection = make_selection(
-    "dts", POPULATION_SIZE, vocab_size=VOCAB_SIZE, dts_cfg=dts_cfg, device=DEVICE
+    "dts",
+    POPULATION_SIZE,
+    vocab_size=VOCAB_SIZE,
+    dts_cfg=dts_cfg,
+    device=DEVICE,
+    custom_reward_function=REWARD_FN,
 )
 
 logger = FileLogger(OUTPUT_PATH)  # per-generation metrics (no domain diversity here)
