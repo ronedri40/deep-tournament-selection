@@ -1,10 +1,10 @@
 # Deep Tournament Selection (DTS) for Genetic Algorithms
 
-Reference implementation of the paper **"Deep Tournament Selection for Genetic Algorithms"**
+Implementation of the paper **"Deep Tournament Selection for Genetic Algorithms"**
 (Eliad Shem-Tov, Ron Edri, Achiya Elyasaf — Ben-Gurion University of the Negev).
 📄 **Paper:** _link coming soon_.
 
-Implemented as a thin EC-KitY adapter (`selection/eckity_adapter.py`), DTS drops into any GA in one
+Implemented as EC-KitY adapter (`selection/eckity_adapter.py`), DTS drops into any GA in one
 line: `selection_methods=[(dts, 1)]`.
 
 <p align="center">
@@ -30,13 +30,14 @@ figures/                # fitness / diversity plots from the paper
 images/                 # architecture diagrams
 ```
 
-## Benchmark domains (from the paper)
+## Benchmark domains from the paper
 
-| Domain | Encoding | Operators | Instances |
-|---|---|---|---|
-| **Graph Coloring** | integer vector (color per vertex) | uniform crossover + uniform mutation | DIMACS, 96–450 vertices |
-| **Set Cover** | bit vector (subset selected) | uniform crossover + bit-flip mutation | OR-Library, 1000/2000 subsets |
-| **TSP** | permutation (tour order) | SCX crossover + RSM mutation | TSPLIB, 48–1291 cities |
+| Domain             | Encoding                          | Instances                     |
+| ------------------ | --------------------------------- | ----------------------------- |
+| **Graph Coloring** | integer vector (color per vertex) | DIMACS, 96–450 vertices       |
+| **Set Cover**      | bit vector (subset selected)      | OR-Library, 1000/2000 subsets |
+| **TSP**            | permutation (tour order)          | TSPLIB, 48–1291 cities        |
+
 
 All are framed as maximization (fitness = negated cost), matching DTS. Instance files are bundled
 under `deep_tournament_selection/problems/data/`.
