@@ -5,13 +5,6 @@ from .simple_self_attention import RecombinationAttention
 
 
 class SelfAttentionPointer(nn.Module):
-    """
-    Pointer network using only:
-        - Transformer encoder
-        - Recombination self-attention to generate pointer logits
-    No autoregressive decoding.
-    """
-
     def __init__(
         self,
         pointer_len,
