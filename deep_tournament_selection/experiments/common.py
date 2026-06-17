@@ -1,11 +1,3 @@
-"""Shared helpers for the DTS experiments.
-
-``build_dts_operator`` constructs the full Deep Tournament Selection stack
-(encoder + pointer decoder + RL training wrapper) and returns it wrapped in the
-EC-KitY ``DeepTournamentSelection`` adapter, ready to drop into a
-``Subpopulation``'s ``selection_methods``.
-"""
-
 from ..selection.dts_policy import DTSPolicy
 from ..selection.eckity_adapter import DeepTournamentSelection
 from ..selection.population_to_vec_transformer import PopulationToVecTransformer

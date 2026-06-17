@@ -1,12 +1,3 @@
-"""Step-by-step Graph Coloring runner.
-
-Unlike the CLI runner in ``experiments/graph_coloring.py``, this is a plain
-notebook-style script: edit the PARAMETERS block, then run the whole file
-(``python -m deep_tournament_selection.runners.graph_coloring``) or step through
-the blocks in an editor. Every component — evaluator, operators, selection,
-GA assembly — is built explicitly so you can tweak one piece without the rest.
-"""
-
 import os
 
 from eckity.algorithms.simple_evolution import SimpleEvolution
@@ -25,7 +16,7 @@ from ..problems import DATA_DIR, GraphColoringEvaluator, VectorUniformCrossover
 from ..problems.diversity import graph_coloring_diversity
 
 # --------------------------------------------------------------------------- #
-# 1. PARAMETERS  — edit these
+# 1. PARAMETERS
 # --------------------------------------------------------------------------- #
 cfg = GraphColoringConfig()
 dts_cfg = DTSConfig()
@@ -62,7 +53,7 @@ operators = [
 ]
 
 # --------------------------------------------------------------------------- #
-# 4. SELECTION  — DTS (learned) or the tournament baseline
+# 4. SELECTION  — DTS
 # --------------------------------------------------------------------------- #
 selection = make_selection(
     SELECTION,
@@ -73,7 +64,7 @@ selection = make_selection(
 )
 
 # --------------------------------------------------------------------------- #
-# 5. ASSEMBLE THE GA  — elitism-protecting breeder + per-generation JSON logger
+# 5. ASSEMBLE THE GA
 # --------------------------------------------------------------------------- #
 logger = FileLogger(OUTPUT_PATH, diversity_fn=graph_coloring_diversity)
 algo = SimpleEvolution(

@@ -1,9 +1,3 @@
-"""Shared helpers for the per-problem experiment runners.
-
-These keep the individual runners (tsp.py, graph_coloring.py, set_cover.py) small
-and consistent.
-"""
-
 import logging
 import os
 

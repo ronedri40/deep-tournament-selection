@@ -1,27 +1,3 @@
-#!/usr/bin/env python
-"""Single entry point to run the DTS experiments across the paper's problems.
-
-This is the one file to run. It sweeps the three benchmark problems
-(TSP, Graph Coloring, Set Cover) over their instances and repetitions, with the
-Deep Tournament Selection (DTS) operator and/or the tournament baseline, writes a
-JSON results file per run and a summary CSV, and prints a results table.
-
-Examples
---------
-    # Quick end-to-end smoke of everything (tiny settings, ~1-2 min):
-    python run_experiments.py --quick
-
-    # DTS on all problems, default (paper) instances, 1 run each, 200 generations:
-    python run_experiments.py --generations 200
-
-    # Full head-to-head DTS vs tournament on specific problems/instances:
-    python run_experiments.py --problems tsp set_cover --selection both \
-        --instances att48.tsp scp41.txt --runs 5 --generations 500
-
-    # The full paper protocol (heavy! pop=100, 6000 gens, 20-30 runs):
-    python run_experiments.py --full
-"""
-
 import argparse
 import csv
 import os

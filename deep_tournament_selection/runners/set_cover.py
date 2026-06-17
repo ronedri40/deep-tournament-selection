@@ -1,11 +1,3 @@
-"""Step-by-step Set Cover runner.
-
-Notebook-style counterpart to ``experiments/set_cover.py`` (no CLI): edit the
-PARAMETERS block, then run the file
-(``python -m deep_tournament_selection.runners.set_cover``) or step through the
-blocks. Every component is built explicitly so you can tweak one piece in place.
-"""
-
 import os
 
 from eckity.algorithms.simple_evolution import SimpleEvolution
@@ -26,7 +18,7 @@ from ..problems import DATA_DIR, SetCoverEvaluator, VectorUniformCrossover
 from ..problems.diversity import set_cover_diversity
 
 # --------------------------------------------------------------------------- #
-# 1. PARAMETERS  — edit these
+# 1. PARAMETERS
 # --------------------------------------------------------------------------- #
 cfg = SetCoverConfig()
 dts_cfg = DTSConfig()
@@ -64,7 +56,7 @@ operators = [
 ]
 
 # --------------------------------------------------------------------------- #
-# 4. SELECTION  — DTS (learned) or the tournament baseline
+# 4. SELECTION  — DTS
 # --------------------------------------------------------------------------- #
 selection = make_selection(
     SELECTION, POPULATION_SIZE, vocab_size=2, dts_cfg=dts_cfg, device=DEVICE

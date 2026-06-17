@@ -1,12 +1,3 @@
-"""Set Cover experiment runner — DTS (or tournament baseline) inside EC-KitY.
-
-Examples
---------
-    python -m deep_tournament_selection.experiments.set_cover
-    python -m deep_tournament_selection.experiments.set_cover --instance scp41.txt --generations 100
-    python -m deep_tournament_selection.experiments.set_cover --selection tournament --instance all
-"""
-
 import argparse
 import os
 

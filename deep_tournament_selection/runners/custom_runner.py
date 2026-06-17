@@ -1,24 +1,3 @@
-"""Template: plug in YOUR OWN problem and test it on DTS.
-
-DTS is a drop-in EC-KitY selection operator, so trying it on a brand-new problem
-means supplying just three things — everything below the "NOTHING PROBLEM-SPECIFIC"
-divider (the DTS operator, elitism-aware breeder, per-generation logging) stays the
-same:
-
-    (A) an evaluator  — your fitness function (higher = better)
-    (B) an encoding   — the creator + genetic operators for your genome
-    (C) vocab_size    — max gene value + 1 (DTS embeds every gene)
-
-and, optionally:
-
-    (D) a reward      — change how DTS itself is trained (default works as-is)
-
-To keep it concrete this file wires those to a dummy **OneMax** problem (maximize
-the number of 1s in a bit string). Touch only the blocks you care about — e.g.
-swap the evaluator for your own problem, or just set a custom reward — and run:
-``python -m deep_tournament_selection.runners.custom_runner``.
-"""
-
 import os
 
 import numpy as np
@@ -40,7 +19,7 @@ from ..logging_utils import FileLogger
 from ..problems import VectorUniformCrossover
 
 # --------------------------------------------------------------------------- #
-# General GA parameters (not problem-specific) — edit freely
+# General GA parameters — edit freely
 # --------------------------------------------------------------------------- #
 dts_cfg = DTSConfig()
 GENERATIONS = 100
@@ -50,11 +29,7 @@ OUTPUT_PATH = os.path.join("runs", "custom", "run_0.json")
 
 
 # =========================================================================== #
-# (A) REPLACE THIS  —  YOUR EVALUATOR (the fitness function; higher = better)
-#
-# Subclass SimpleIndividualEvaluator and return a float for one individual.
-# ``individual.vector`` is the genome (a list of ints). Frame your objective as
-# MAXIMIZATION (DTS assumes higher is better) — for a cost, return its negative.
+# (A) YOUR EVALUATOR (the fitness function; higher = better)
 # =========================================================================== #
 class OneMaxEvaluator(SimpleIndividualEvaluator):
     """Dummy problem: maximize the number of 1s in the bit string."""
@@ -66,8 +41,8 @@ class OneMaxEvaluator(SimpleIndividualEvaluator):
 evaluator = OneMaxEvaluator()
 
 # =========================================================================== #
-# (B) REPLACE THIS  —  YOUR ENCODING: the creator + genetic operators
-# (C) REPLACE THIS  —  VOCAB_SIZE: max gene value + 1 (here bits 0/1 -> 2)
+# YOUR ENCODING: the creator + genetic operators
+# VOCAB_SIZE: max gene value + 1 (here bits 0/1 -> 2)
 #
 # The creator defines the genome; the operators must match its type. DTS works
 # with any integer/bit vector or permutation encoding.
@@ -86,15 +61,12 @@ operators = [
 # (D) OPTIONAL  —  change how DTS is TRAINED with a custom reward
 #
 # Leave REWARD_FN = None to use the default reward. To customize, point it at a
-# function f(cur_gen_fitness, prev_gen_fitness, population) -> float, e.g. the
-# paper's reward:
-#     from ..selection.custom_reward import custom_reward
-#     REWARD_FN = custom_reward
+# function f(cur_gen_fitness, prev_gen_fitness, population) -> float
 # =========================================================================== #
 REWARD_FN = None
 
 # =========================================================================== #
-# NOTHING PROBLEM-SPECIFIC BELOW — DTS + GA assembly, identical for any problem
+# DTS + GA assembly, identical for any problem
 # =========================================================================== #
 evaluator = CachingEvaluator(evaluator)  # cross-generation fitness cache
 
@@ -107,7 +79,7 @@ selection = make_selection(
     custom_reward_function=REWARD_FN,
 )
 
-logger = FileLogger(OUTPUT_PATH)  # per-generation metrics (no domain diversity here)
+logger = FileLogger(OUTPUT_PATH)
 algo = SimpleEvolution(
     Subpopulation(
         creators=creator,

@@ -1,11 +1,3 @@
-"""Step-by-step TSP runner.
-
-Notebook-style counterpart to ``experiments/tsp.py`` (no CLI): edit the
-PARAMETERS block, then run the file
-(``python -m deep_tournament_selection.runners.tsp``) or step through the blocks.
-Every component is built explicitly so you can tweak one piece in place.
-"""
-
 import os
 
 from eckity.algorithms.simple_evolution import SimpleEvolution
@@ -26,7 +18,7 @@ from ..problems import (
 from ..problems.diversity import tsp_edge_diversity
 
 # --------------------------------------------------------------------------- #
-# 1. PARAMETERS  — edit these
+# 1. PARAMETERS
 # --------------------------------------------------------------------------- #
 cfg = TSPConfig()
 dts_cfg = DTSConfig()
@@ -60,7 +52,7 @@ operators = [
 ]
 
 # --------------------------------------------------------------------------- #
-# 4. SELECTION  — DTS (learned) or the tournament baseline
+# 4. SELECTION  — DTS
 # --------------------------------------------------------------------------- #
 selection = make_selection(
     SELECTION, POPULATION_SIZE, vocab_size=num_cities, dts_cfg=dts_cfg, device=DEVICE
